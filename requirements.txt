@@ -1,9 +1,0 @@
-# Dependencies for GitHub Roast and Rescue
-
-# Core API & CLI
-requests>=2.31.0
-colorama>=0.4.6
-
-# Testing
-pytest>=7.4.0
-pytest-mock>=3.13.0

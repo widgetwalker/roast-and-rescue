@@ -1,0 +1,5 @@
+{
+  "name": "GitHub Roast & Rescue",
+  "description": "Neo-Brutalist developer feedback dashboard delivering honest GitHub profile roasts and actionable rescue plans.",
+  "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
