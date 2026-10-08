@@ -4,8 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Neo-Brutalist developer feedback dashboard delivering honest GitHub profile roasts and actionable rescue plans.">
+  <meta name="theme-color" content="#ffff00">
   <meta property="og:title" content="GitHub Roast & Rescue // Neo-Brutalist Bento">
   <meta property="og:description" content="Neo-Brutalist developer feedback dashboard delivering honest GitHub profile roasts and actionable rescue plans.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="GitHub Roast & Rescue // Neo-Brutalist Bento">
+  <meta name="twitter:description" content="Neo-Brutalist developer feedback dashboard delivering honest GitHub profile roasts and actionable rescue plans.">
+  <link rel="icon" type="image/svg+xml" href="/assets/tech-deity.svg">
   <title>GitHub Roast &amp; Rescue // Neo-Brutalist Bento</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -104,7 +110,57 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .shape, .bg-watermark { animation: none; }
+      *, *::before, *::after {
+        animation-duration: 0.001s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001s !important;
+      }
+      .shape, .bg-watermark { animation: none !important; }
+    }
+
+    /* Screen reader only utility (WCAG 2.1 AA) */
+    .sr-only {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
+    /* Accessible Skip Link for Keyboard Navigation */
+    .skip-link {
+      position: absolute;
+      top: -120px;
+      left: 1rem;
+      background: var(--neon-yellow);
+      color: #000000;
+      padding: 0.8rem 1.4rem;
+      border: 4px solid #000000;
+      box-shadow: 6px 6px 0px #000000;
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      text-decoration: none;
+      z-index: 100000;
+      transition: top 0.15s cubic-bezier(0, 0, 0.2, 1);
+    }
+    .skip-link:focus {
+      top: 1rem;
+      outline: 4px solid #000000;
+    }
+
+    /* WCAG 2.1 Focus Visibility Indicators */
+    :focus-visible {
+      outline: 3px solid #000000 !important;
+      outline-offset: 3px !important;
+    }
+    button:focus-visible, input:focus-visible, a:focus-visible, textarea:focus-visible {
+      box-shadow: 0 0 0 3px #ffff00, 0 0 0 6px #000000 !important;
     }
 
     /* Hazard-stripe section dividers */
@@ -1158,6 +1214,10 @@
   </style>
 </head>
 <body>
+  <!-- Accessible skip navigation for keyboard and screen reader users -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div id="a11y-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
   <div class="bg-decor" aria-hidden="true">
     <div class="bg-watermark">ROAST ★ RESCUE</div>
     <div class="shape" style="--r: 12deg; top: 12%; left: 2%; width: 72px; height: 72px; background: var(--neon-cyan);"></div>
@@ -1167,30 +1227,32 @@
     <div class="shape shape-ring" style="bottom: 8%; left: 4%; width: 70px; height: 70px; background: var(--neon-yellow); animation-delay: -2s;"></div>
     <div class="shape" style="--r: -8deg; bottom: 12%; right: 5%; width: 88px; height: 28px; background: #000000; animation-delay: -7s;"></div>
   </div>
-  <div class="container">
+  <main class="container" id="main-content" role="main">
     
     <div class="top-badge-row">
       <div class="triad-badge">⚡ SYSTEM ARCHITECTURE // NODE.JS • REST API • CLOUD RUN</div>
     </div>
 
-    <header>
+    <header role="banner">
       <h1><span class="flame">ROAST</span> &amp; <span class="rescue">RESCUE</span></h1>
       <p class="subtitle">Bento Dashboard • Zero corporate fluff. Brutal honesty + high-leverage developer advice.</p>
     </header>
 
-    <div class="search-box">
-      <span class="input-prefix">@</span>
-      <input type="text" id="usernameInput" placeholder="github-username (e.g. octocat, torvalds)" value="octocat" autocomplete="off" spellcheck="false">
-      <button class="btn-roast" id="roastBtn" onclick="runRoast()">
-        <span class="spinner" id="spinner"></span>
-        <span id="btnText">ROAST NOW</span> <i data-lucide="zap"></i>
+    <div class="search-box" role="search">
+      <label for="usernameInput" class="sr-only">GitHub username to analyze</label>
+      <span class="input-prefix" aria-hidden="true">@</span>
+      <input type="text" id="usernameInput" aria-label="GitHub username to analyze" placeholder="github-username (e.g. octocat, torvalds)" value="octocat" autocomplete="off" spellcheck="false">
+      <button class="btn-roast" id="roastBtn" aria-label="Run profile roast" onclick="runRoast()">
+        <span class="spinner" id="spinner" aria-hidden="true"></span>
+        <span id="btnText">ROAST NOW</span> <i data-lucide="zap" aria-hidden="true"></i>
       </button>
-      <button class="btn-subtle" id="toggleBattleBtn" onclick="toggleBattleMode()"><i data-lucide="swords"></i> Battle Mode</button>
+      <button class="btn-subtle" id="toggleBattleBtn" aria-expanded="false" aria-label="Toggle Battle Mode" onclick="toggleBattleMode()"><i data-lucide="swords" aria-hidden="true"></i> Battle Mode</button>
     </div>
 
-    <div class="battle-input-row" id="battleRow">
-      <span class="input-prefix">VS @</span>
-      <input type="text" id="opponentInput" placeholder="opponent-username" value="" autocomplete="off" spellcheck="false">
+    <div class="battle-input-row" id="battleRow" role="region" aria-label="Battle opponent selection">
+      <label for="opponentInput" class="sr-only">Opponent GitHub username</label>
+      <span class="input-prefix" aria-hidden="true">VS @</span>
+      <input type="text" id="opponentInput" aria-label="Opponent GitHub username" placeholder="opponent-username" value="" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="shortcuts-row">
@@ -1198,7 +1260,7 @@
       <span><span class="kbd">Ctrl</span>+<span class="kbd">K</span> Focus Input</span>
     </div>
 
-    <div class="error-box" id="errorBox"></div>
+    <div class="error-box" id="errorBox" role="alert" aria-live="assertive"></div>
 
     <div class="hazard-strip" aria-hidden="true"></div>
 
@@ -1236,11 +1298,11 @@
         </div>
         <div class="roast-quote-box" id="roastContent">Loading roast...</div>
         <div class="share-actions-row">
-          <button class="btn-subtle" id="copyBadgeBtn" onclick="copyBadgeMarkdown()">
-            <i data-lucide="badge-check"></i> Copy README Badge
+          <button class="btn-subtle" id="copyBadgeBtn" aria-label="Copy README Badge" onclick="copyBadgeMarkdown()">
+            <i data-lucide="badge-check" aria-hidden="true"></i> Copy README Badge
           </button>
-          <button class="btn-subtle" onclick="shareRoastOnX()">
-            <i data-lucide="share-2"></i> Share on X
+          <button class="btn-subtle" aria-label="Share roast on X" onclick="shareRoastOnX()">
+            <i data-lucide="share-2" aria-hidden="true"></i> Share on X
           </button>
         </div>
       </div>
@@ -1249,10 +1311,10 @@
       <div class="bento-card card-mental" id="mentalCard">
         <div class="sticker sticker-mental" aria-hidden="true">
           <div class="sticker-tape" style="transform: rotate(8deg);"></div>
-          <div class="sticker-emoji"><i data-lucide="brain" class="icon-pulse"></i></div>
+          <div class="sticker-emoji"><i data-lucide="brain" class="icon-pulse" aria-hidden="true"></i></div>
         </div>
         <div class="card-header">
-          <span class="badge-tag tag-red"><i data-lucide="activity"></i> Mental Stability</span>
+          <span class="badge-tag tag-red"><i data-lucide="activity" aria-hidden="true"></i> Mental Stability</span>
           <span style="font-size: 0.75rem; color: #ff0000; font-family: var(--font-mono);">PSYCH-EVAL</span>
         </div>
         <div class="mental-status" id="mentalStatus">[+] AWAITING SCAN</div>
@@ -1263,23 +1325,23 @@
       <div class="bento-card card-rescue">
         <div class="sticker sticker-rescue" aria-hidden="true">
           <div class="sticker-tape"></div>
-          <div class="sticker-emoji"><i data-lucide="life-buoy" class="icon-buoy"></i></div>
+          <div class="sticker-emoji"><i data-lucide="life-buoy" class="icon-buoy" aria-hidden="true"></i></div>
         </div>
         <div class="card-header">
-          <span class="badge-tag tag-lime"><i data-lucide="life-buoy" class="icon-buoy"></i> The Rescue Plan</span>
+          <span class="badge-tag tag-lime"><i data-lucide="life-buoy" class="icon-buoy" aria-hidden="true"></i> The Rescue Plan</span>
           <span style="font-size: 0.75rem; color: #10b981; font-family: var(--font-mono);">ACTION ROADMAP</span>
         </div>
         <div class="rescue-steps-grid" id="rescueStepsGrid">
           <div class="step-card">
-            <div class="step-header"><i data-lucide="zap"></i> 10-Min Quick Win</div>
+            <div class="step-header"><i data-lucide="zap" aria-hidden="true"></i> 10-Min Quick Win</div>
             <div class="step-body" id="rescueStep1">Loading action...</div>
           </div>
           <div class="step-card">
-            <div class="step-header"><i data-lucide="target"></i> Weekend Project</div>
+            <div class="step-header"><i data-lucide="target" aria-hidden="true"></i> Weekend Project</div>
             <div class="step-body" id="rescueStep2">Loading action...</div>
           </div>
           <div class="step-card">
-            <div class="step-header"><i data-lucide="rocket"></i> Career Growth</div>
+            <div class="step-header"><i data-lucide="rocket" aria-hidden="true"></i> Career Growth</div>
             <div class="step-body" id="rescueStep3">Loading action...</div>
           </div>
         </div>
@@ -1288,7 +1350,7 @@
       <!-- 5. Resume vs. Reality audit -->
       <div class="bento-card card-reality" id="realityCard">
         <div class="card-header">
-          <span class="badge-tag tag-yellow"><i data-lucide="file-search"></i> Resume vs. Reality</span>
+          <span class="badge-tag tag-yellow"><i data-lucide="file-search" aria-hidden="true"></i> Resume vs. Reality</span>
           <span class="badge-tag tag-cyan" id="vibeRatioBadge">VIBE AUDIT</span>
         </div>
         <div class="reality-headline" id="realityHeadline">
@@ -1297,17 +1359,17 @@
         <div class="reality-list" id="realityList"></div>
         <div class="reality-verdict" id="realityVerdict"></div>
         <div class="share-actions-row" style="margin-top: 1rem;">
-          <button class="btn-subtle" id="uploadResumeBtn" onclick="document.getElementById('resumeFile').click()">
-            <i data-lucide="upload"></i> Upload Resume
+          <button class="btn-subtle" id="uploadResumeBtn" aria-label="Upload Resume Document" onclick="document.getElementById('resumeFile').click()">
+            <i data-lucide="upload" aria-hidden="true"></i> Upload Resume
           </button>
-          <input type="file" id="resumeFile" accept=".pdf,.txt,.md,.markdown,.text" hidden onchange="handleResumeFile(this)">
+          <input type="file" id="resumeFile" aria-label="Upload resume file" accept=".pdf,.txt,.md,.markdown,.text" hidden onchange="handleResumeFile(this)">
           <span id="resumeFileName" style="font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; align-self: center;">PDF, TXT or Markdown — compared against live Git telemetry</span>
         </div>
         <details class="reality-paste" id="realityPaste" hidden>
           <summary>No profile README found — paste a bio to audit instead</summary>
-          <textarea id="bioPaste" rows="4" placeholder="Paste LinkedIn summary or resume bio…"></textarea>
+          <textarea id="bioPaste" aria-label="Paste bio or summary" rows="4" placeholder="Paste LinkedIn summary or resume bio…"></textarea>
           <div style="margin-top: 0.6rem;">
-            <button class="btn-subtle" onclick="auditPastedBio()">Audit Bio</button>
+            <button class="btn-subtle" aria-label="Audit pasted bio" onclick="auditPastedBio()">Audit Bio</button>
           </div>
         </details>
       </div>
@@ -1316,28 +1378,28 @@
 
     <div class="hazard-strip" aria-hidden="true"></div>
 
-    <div style="text-align: center; font-size: 0.78rem; color: #64748b; margin-top: 1rem; font-family: var(--font-mono);">
+    <footer role="contentinfo" style="text-align: center; font-size: 0.85rem; color: #111827; margin-top: 1.5rem; font-family: var(--font-mono); font-weight: 700;">
       GitHub Roast &amp; Rescue • Built for AI Hackathon 2026 • Powered by Cloud Run
-    </div>
-  </div>
+    </footer>
+  </main>
 
   <!-- WALL OF SHAME – off-canvas leaderboard drawer -->
-  <button class="shame-toggle" id="shameToggle" onclick="toggleShame()">☠ View Leaderboard</button>
-  <aside class="shame-drawer" id="shameDrawer" aria-hidden="true" aria-label="Wall of Shame leaderboard">
+  <button class="shame-toggle" id="shameToggle" aria-expanded="false" aria-label="View Wall of Shame leaderboard" onclick="toggleShame()">☠ View Leaderboard</button>
+  <aside class="shame-drawer" id="shameDrawer" role="dialog" aria-modal="true" aria-labelledby="shameTitle" aria-hidden="true">
     <div class="shame-drawer-header">
-      <span>☠ Wall of Shame</span>
-      <button class="shame-close" onclick="toggleShame()">✕ Close</button>
+      <span id="shameTitle">☠ Wall of Shame</span>
+      <button class="shame-close" aria-label="Close leaderboard" onclick="toggleShame()">✕ Close</button>
     </div>
     <div class="shame-sub">Freshly roasted · hall of commit disgrace</div>
-    <div class="shame-list" id="shameList">
+    <div class="shame-list" id="shameList" role="list">
       <div class="shame-empty">Loading the hall of shame…</div>
     </div>
   </aside>
 
   <!-- BATTLE ARENA – head-to-head roast comparison modal -->
-  <div class="battle-overlay" id="battleOverlay" onclick="if (event.target === this) toggleBattleArena(false)">
-    <div class="battle-arena" id="battleArena" role="dialog" aria-label="Roast battle arena">
-      <div class="battle-title"><i data-lucide="swords"></i> Roast Battle</div>
+  <div class="battle-overlay" id="battleOverlay" role="dialog" aria-modal="true" aria-labelledby="battleTitle" onclick="if (event.target === this) toggleBattleArena(false)">
+    <div class="battle-arena" id="battleArena" role="document">
+      <h2 class="battle-title" id="battleTitle"><i data-lucide="swords" aria-hidden="true"></i> Roast Battle</h2>
       <div class="battle-cols">
         <div class="battle-fighter" id="fighter1">
           <div class="battle-name" id="battleName1">@—</div>
@@ -1440,6 +1502,14 @@
       }
     }
 
+    function announceA11y(message) {
+      const el = document.getElementById('a11y-announcer');
+      if (el) {
+        el.textContent = '';
+        setTimeout(() => { el.textContent = message; }, 50);
+      }
+    }
+
     async function runRoast() {
       const input = document.getElementById('usernameInput');
       const btn = document.getElementById('roastBtn');
@@ -1458,6 +1528,7 @@
         if (!opp) {
           errorBox.textContent = 'ERROR: Battle Mode needs an opponent — enter one next to VS @.';
           errorBox.style.display = 'block';
+          announceA11y('ERROR: Battle Mode needs an opponent');
           document.getElementById('opponentInput').focus();
           return;
         }
@@ -1469,6 +1540,7 @@
       spinner.style.display = 'inline-block';
       btnText.textContent = 'ROASTING...';
       btn.disabled = true;
+      announceA11y('Analyzing GitHub profile for ' + username + '...');
 
       try {
         const response = await fetch('/roast', {
@@ -1524,10 +1596,12 @@
           setHighlighted('rescueStep3', 'Ship 1 pull request to an upstream open-source tool.');
         }
         refreshIcons();
+        announceA11y('Profile roast completed for ' + username + '. Archetype: ' + meme.label);
 
       } catch (err) {
         errorBox.textContent = 'ERROR: ' + err.message;
         errorBox.style.display = 'block';
+        announceA11y('ERROR: ' + err.message);
         // Never leave the meme hidden on failure – restore resting state
         if (window.gsap) {
           gsap.set('#memeClip', { x: 0, y: 0, rotation: 12, opacity: 1, scale: 1 });

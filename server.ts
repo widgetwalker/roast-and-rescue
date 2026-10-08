@@ -241,22 +241,56 @@ async function runFullAnalysis(client: GitHubClient, username: string): Promise<
   });
 }
 
+const rootDir = process.cwd();
+
 // App Middleware
 app.use(cors());
 app.use(express.json({ limit: "20mb" }));
 
+// Security Headers Middleware
+app.use((_req: Request, res: Response, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  next();
+});
+
+// In-Memory Rate Limiter (Protects against DoS / excessive calls)
+const requestCounts = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const MAX_REQUESTS_PER_WINDOW = 120;
+
+app.use((req: Request, res: Response, next) => {
+  const ip = req.ip || req.socket.remoteAddress || "unknown";
+  const now = Date.now();
+  const record = requestCounts.get(ip);
+  if (!record || now > record.resetTime) {
+    requestCounts.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return next();
+  }
+  record.count++;
+  if (record.count > MAX_REQUESTS_PER_WINDOW) {
+    res.status(429).json({
+      status: "error",
+      message: "Too many requests. Please slow down and try again in a minute.",
+    });
+    return;
+  }
+  next();
+});
+
 // Static Assets & Web Dashboard
-app.use("/assets", express.static(path.join(__dirname, "assets")));
-app.use(express.static(path.join(__dirname, "public")));
+app.use("/assets", express.static(path.join(rootDir, "assets")));
+app.use(express.static(path.join(rootDir, "public")));
 
 // Route: Dashboard GET / and /index.html
 app.get(["/", "/index.html"], (_req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(path.join(rootDir, "public", "index.html"));
 });
 
 // Route: Architecture diagram GET /architecture.html
 app.get("/architecture.html", (_req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, "architecture.html"));
+  res.sendFile(path.join(rootDir, "architecture.html"));
 });
 
 // Route: Health checks
@@ -266,6 +300,8 @@ app.get(["/health", "/healthz", "/_ah/health"], (_req: Request, res: Response) =
     service: "github-roast-and-rescue",
     version: "1.0.0",
     target: "google-cloud-run",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
   });
 });
 
@@ -297,7 +333,7 @@ app.get(["/badge/:username", "/badge/:username.svg"], async (req: Request, res: 
 // Route: POST /roast & /api/roast
 app.post(["/roast", "/api/roast"], async (req: Request, res: Response) => {
   if (!req.body || typeof req.body !== "object" || Object.keys(req.body).length === 0) {
-    res.status(400).json({ error: "Missing JSON request body" });
+    res.status(400).json({ status: "error", message: "Missing JSON request body with 'username'" });
     return;
   }
 
@@ -414,7 +450,7 @@ app.post(["/roast", "/api/roast"], async (req: Request, res: Response) => {
 // Route: POST /battle & /api/battle
 app.post(["/battle", "/api/battle"], async (req: Request, res: Response) => {
   if (!req.body || typeof req.body !== "object" || Object.keys(req.body).length === 0) {
-    res.status(400).json({ error: "Missing JSON request body" });
+    res.status(400).json({ status: "error", message: "Missing JSON request body with 'user1' and 'user2'" });
     return;
   }
 
@@ -572,6 +608,17 @@ app.post(["/resume-audit", "/api/resume-audit"], async (req: Request, res: Respo
     console.error("Resume audit error:", err);
     res.status(500).json({ status: "error", message: `Resume audit error: ${err.message}` });
   }
+});
+
+// 404 Not Found Handler
+app.use((_req: Request, res: Response) => {
+  res.status(404).json({ error: "Endpoint not found" });
+});
+
+// Global Error Handler
+app.use((err: any, _req: Request, res: Response, _next: any) => {
+  console.error("Unhandled server error:", err);
+  res.status(500).json({ status: "error", message: err?.message || "Internal server error" });
 });
 
 // Start Express Server

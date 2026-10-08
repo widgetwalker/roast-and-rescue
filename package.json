@@ -7,7 +7,12 @@
     "dev": "tsx server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test": "tsx test.ts",
+    "test:a11y": "tsx test.ts --a11y",
+    "test:unit": "tsx test.ts --unit",
+    "test:analyzer": "tsx test.ts --analyzer",
+    "test:api": "tsx test.ts --api"
   },
   "dependencies": {
     "cors": "^2.8.5",
