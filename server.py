@@ -354,14 +354,6 @@ def get_github_client():
 
 def get_brutalist_formatter():
     """Dynamically get Brutalist layout formatter."""
-    try:
-        import output
-        import importlib
-        importlib.reload(output)
-        if hasattr(output, "brutalist_layout"):
-            return output.brutalist_layout
-    except Exception:
-        pass
 
     def fallback_brutalist(sections: Dict[str, str], width: int = 80) -> str:
         lines = [
