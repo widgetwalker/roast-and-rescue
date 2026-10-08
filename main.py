@@ -46,13 +46,13 @@ def main():
     args = parser.parse_args()
 
     if args.antigravity:
-        print("\n🕊️  ANTIGRAVITY ENGAGED!  🕊️")
-        print("“I wrote 20 lines of code in Python and now I'm flying!” — xkcd #353")
+        print("\n🕊️  ANTIGRAVITY ENGAGED  🕊️")
+        print("Zero-gravity mode enabled — floating above the grind.")
         try:
             import antigravity  # Python standard library easter egg
         except Exception:
             pass
-        print("🚀 Escaping code gravity with Claude, OpenCode & Antigravity... Happy hacking!\n")
+        print("⚡ Built with Claude + OpenCode + Antigravity\n")
         return
 
     raw_username = args.username_flag or args.username
@@ -64,9 +64,6 @@ def main():
     if not USERNAME_REGEX.match(username):
         print(f"Error: Invalid GitHub username format '{username}'. GitHub usernames may only contain alphanumeric characters and hyphens.", file=sys.stderr)
         sys.exit(1)
-
-    print(f"🔍 Roasting GitHub profile: @{username}")
-    print("=" * 50)
 
     # Step 1: Fetch GitHub data
     client = GitHubClient()

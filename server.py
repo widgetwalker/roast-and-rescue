@@ -154,114 +154,132 @@ def get_bento_formatter():
     return fallback_bento
 
 
-# Bento Style Web Dashboard HTML
+# Bento Style Web Dashboard HTML (Neo-Brutalist Edition)
 BENTO_WEB_HTML = """<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GitHub Roast & Rescue | Bento Dashboard</title>
+  <title>GitHub Roast & Rescue // Neo-Brutalist Bento</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-base: #0a0c10;
-      --bg-surface: #12161f;
-      --bg-card: rgba(22, 27, 39, 0.75);
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-focus: #f97316;
-      --accent-flame: #ff5722;
-      --accent-glow: rgba(255, 87, 34, 0.25);
-      --accent-rescue: #10b981;
-      --accent-recruiter: #3b82f6;
-      --text-main: #f1f5f9;
-      --text-muted: #94a3b8;
-      --font-display: 'Outfit', sans-serif;
+      --bg-canvas: #0a0c10;
+      --bg-card: #12151e;
+      --bg-card-alt: #181d2a;
+      --border-dark: 2.5px solid #2a3144;
+      --border-black: 2.5px solid #000000;
+      --shadow-hard: 5px 5px 0px #000000;
+      --shadow-cyan: 5px 5px 0px #00F0FF;
+      --shadow-orange: 5px 5px 0px #FF4D00;
+      --shadow-lime: 5px 5px 0px #D4FF00;
+      --neon-cyan: #00F0FF;
+      --neon-orange: #FF4D00;
+      --neon-lime: #D4FF00;
+      --neon-purple: #C084FC;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --font-display: 'Space Grotesk', -apple-system, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background-color: var(--bg-base);
+      background-color: var(--bg-canvas);
+      background-image: 
+        radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: 20px 20px;
       color: var(--text-main);
       font-family: var(--font-display);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 2rem 1rem;
-      background-image: 
-        radial-gradient(circle at 50% 0%, rgba(255, 87, 34, 0.12) 0%, transparent 60%),
-        radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 50%);
+      padding: 2.5rem 1rem;
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1060px;
       width: 100%;
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 0.5rem;
+    /* Top Triad Badge */
+    .top-badge-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 0.25rem;
     }
 
-    .badge-bar {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.35rem 0.85rem;
-      background: rgba(255, 87, 34, 0.15);
-      border: 1px solid rgba(255, 87, 34, 0.3);
-      border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #ff8a65;
-      margin-bottom: 0.75rem;
+    .triad-badge {
+      background: #000000;
+      color: var(--neon-cyan);
+      border: 2px solid var(--neon-cyan);
+      box-shadow: 3px 3px 0px var(--neon-cyan);
+      padding: 0.35rem 0.9rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-radius: 4px;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
     }
 
     h1 {
-      font-size: 2.75rem;
+      font-size: 3rem;
       font-weight: 800;
-      letter-spacing: -0.03em;
-      background: linear-gradient(135deg, #ffffff 40%, #fdba74 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      line-height: 1.05;
       margin-bottom: 0.5rem;
+      color: #ffffff;
+      text-shadow: 3px 3px 0px #000;
     }
+
+    h1 span.flame { color: var(--neon-orange); }
+    h1 span.rescue { color: var(--neon-lime); }
 
     p.subtitle {
       color: var(--text-muted);
-      font-size: 1.1rem;
+      font-size: 1.05rem;
+      font-weight: 500;
     }
 
-    .input-bar {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+    /* Brutalist Input Bar */
+    .search-box {
+      background: #141722;
+      border: 3px solid #ffffff;
+      box-shadow: 6px 6px 0px #000000;
+      border-radius: 8px;
+      padding: 0.5rem;
       display: flex;
       gap: 0.5rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
     }
 
-    .input-bar:focus-within {
-      border-color: var(--border-focus);
-      box-shadow: 0 0 25px var(--accent-glow);
+    .search-box:focus-within {
+      border-color: var(--neon-lime);
+      box-shadow: 6px 6px 0px var(--neon-lime);
     }
 
     .input-prefix {
-      color: var(--accent-flame);
+      color: var(--neon-orange);
       font-family: var(--font-mono);
-      font-weight: 700;
-      font-size: 1.2rem;
+      font-weight: 800;
+      font-size: 1.4rem;
       display: flex;
       align-items: center;
+      padding-left: 0.75rem;
     }
 
     input[type="text"] {
@@ -269,9 +287,10 @@ BENTO_WEB_HTML = """<!DOCTYPE html>
       background: transparent;
       border: none;
       outline: none;
-      color: var(--text-main);
-      font-size: 1.15rem;
+      color: #ffffff;
+      font-size: 1.2rem;
       font-family: var(--font-mono);
+      font-weight: 700;
     }
 
     input[type="text"]::placeholder {
@@ -279,44 +298,63 @@ BENTO_WEB_HTML = """<!DOCTYPE html>
     }
 
     button.btn-roast {
-      background: linear-gradient(135deg, #ff5722 0%, #ea580c 100%);
-      color: #ffffff;
-      border: none;
+      background: var(--neon-lime);
+      color: #000000;
+      border: 2.5px solid #000000;
+      box-shadow: 4px 4px 0px #000000;
       padding: 0.85rem 1.75rem;
-      border-radius: 12px;
+      border-radius: 6px;
       font-size: 1rem;
-      font-weight: 700;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      transition: transform 0.15s ease, filter 0.15s ease;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
     }
 
     button.btn-roast:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.1);
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0px #000000;
+      background: #e1ff33;
     }
 
     button.btn-roast:active {
-      transform: translateY(0);
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #000000;
     }
 
-    .shortcuts-hint {
+    .shortcuts-row {
       display: flex;
       justify-content: center;
       gap: 1.5rem;
-      font-size: 0.8rem;
-      color: #64748b;
+      font-size: 0.82rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
     }
 
     .kbd {
-      background: #1e293b;
+      background: #1e2433;
       padding: 0.15rem 0.45rem;
+      border: 1.5px solid #3b4560;
       border-radius: 4px;
-      border: 1px solid #334155;
+      color: #f1f5f9;
+      font-weight: 700;
+      box-shadow: 1px 1px 0px #000;
+    }
+
+    .error-box {
+      display: none;
+      background: #3b1115;
+      border: 2.5px solid #ff4d4d;
+      box-shadow: 4px 4px 0px #000;
+      color: #ffcccc;
+      padding: 1rem;
+      border-radius: 6px;
       font-family: var(--font-mono);
-      color: #cbd5e1;
+      font-size: 0.9rem;
     }
 
     /* Bento Grid */
@@ -324,51 +362,17 @@ BENTO_WEB_HTML = """<!DOCTYPE html>
       display: grid;
       grid-template-columns: repeat(12, 1fr);
       gap: 1.25rem;
-      margin-top: 1rem;
     }
 
     .bento-card {
       background: var(--bg-card);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--border-subtle);
-      border-radius: 20px;
-      padding: 1.5rem;
+      border: var(--border-dark);
+      border-radius: 10px;
+      padding: 1.4rem;
       display: flex;
       flex-direction: column;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-
-    .bento-card:hover {
-      border-color: rgba(255, 255, 255, 0.18);
-      transform: translateY(-2px);
-    }
-
-    .card-recruiter {
-      grid-column: span 12;
-      border-top: 3px solid var(--accent-recruiter);
-    }
-
-    .card-roast {
-      grid-column: span 5;
-      border-top: 3px solid var(--accent-flame);
-      background: linear-gradient(180deg, rgba(255, 87, 34, 0.08) 0%, rgba(22, 27, 39, 0.75) 100%);
-    }
-
-    .card-rescue {
-      grid-column: span 7;
-      border-top: 3px solid var(--accent-rescue);
-    }
-
-    .card-raw {
-      grid-column: span 12;
-    }
-
-    @media (max-width: 900px) {
-      .card-roast, .card-rescue {
-        grid-column: span 12;
-      }
+      box-shadow: var(--shadow-hard);
+      transition: transform 0.15s ease, border-color 0.15s ease;
     }
 
     .card-header {
@@ -376,192 +380,251 @@ BENTO_WEB_HTML = """<!DOCTYPE html>
       align-items: center;
       justify-content: space-between;
       margin-bottom: 1rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1.5px dashed rgba(255, 255, 255, 0.12);
     }
 
-    .card-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+    .badge-tag {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      border: 2px solid #000;
+      box-shadow: 2px 2px 0px #000;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
     }
 
-    .card-content {
-      color: #cbd5e1;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      white-space: pre-wrap;
+    .tag-cyan { background: var(--neon-cyan); color: #000; }
+    .tag-orange { background: var(--neon-orange); color: #000; }
+    .tag-lime { background: var(--neon-lime); color: #000; }
+    .tag-purple { background: var(--neon-purple); color: #000; }
+
+    /* Grid Layouts */
+    .card-recruiter {
+      grid-column: span 5;
+      border: 2.5px solid #2a3144;
     }
 
-    .roast-quote {
+    .card-roast {
+      grid-column: span 7;
+      border: 2.5px solid #3d2319;
+      background: linear-gradient(180deg, #181216 0%, #12151e 100%);
+    }
+
+    .card-rescue {
+      grid-column: span 12;
+      border: 2.5px solid #1c2e24;
+    }
+
+    .card-terminal {
+      grid-column: span 12;
+      border: 2.5px solid #2a3144;
+    }
+
+    @media (max-width: 860px) {
+      .card-recruiter, .card-roast { grid-column: span 12; }
+      h1 { font-size: 2.2rem; }
+    }
+
+    /* Content Typography */
+    .recruiter-content {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: #e2e8f0;
+      white-space: pre-line;
+    }
+
+    .roast-quote-box {
+      background: rgba(255, 77, 0, 0.08);
+      border-left: 4px solid var(--neon-orange);
+      padding: 1rem 1.2rem;
+      border-radius: 4px;
       font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.5;
+      color: #fff;
       font-style: italic;
-      color: #ffedd5;
-      border-left: 3px solid var(--accent-flame);
-      padding-left: 1rem;
-      margin: 0.5rem 0;
     }
 
-    .rescue-section {
-      margin-bottom: 1rem;
+    /* Rescue 3-Card Grid */
+    .rescue-steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 0.5rem;
     }
 
-    .raw-terminal {
-      background: #050608;
-      border: 1px solid #1e293b;
-      border-radius: 12px;
-      padding: 1.25rem;
+    @media (max-width: 800px) {
+      .rescue-steps-grid { grid-template-columns: 1fr; }
+    }
+
+    .step-card {
+      background: #181d2a;
+      border: 2px solid #2d364f;
+      box-shadow: 3px 3px 0px #000;
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .step-header {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--neon-lime);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .step-body {
+      font-size: 0.92rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    /* Terminal Output */
+    .terminal-box {
+      background: #05060a;
+      border: 2px solid #1f2535;
+      border-radius: 6px;
+      padding: 1rem;
       font-family: var(--font-mono);
       font-size: 0.82rem;
       color: #38bdf8;
       overflow-x: auto;
       white-space: pre;
+      line-height: 1.45;
     }
 
-    .btn-copy {
-      background: #1e293b;
-      color: #cbd5e1;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 0.35rem 0.75rem;
-      font-size: 0.75rem;
+    .btn-brutal {
+      background: #1e2433;
+      color: #f1f5f9;
+      border: 2px solid #3b4560;
+      box-shadow: 2px 2px 0px #000;
+      padding: 0.35rem 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-radius: 4px;
       cursor: pointer;
-      font-weight: 600;
-    }
-    .btn-copy:hover {
-      background: #334155;
-      color: #fff;
+      transition: all 0.1s ease;
     }
 
-    .disclaimer-badge {
-      font-size: 0.75rem;
-      color: #64748b;
-      text-align: center;
-      margin-top: 1.5rem;
-      font-style: italic;
+    .btn-brutal:hover {
+      background: #2b3347;
+      border-color: #60a5fa;
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px #000;
     }
 
-    /* Loading Spinner */
+    .btn-brutal:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px #000;
+    }
+
+    /* Spinner */
     .spinner {
       display: none;
-      width: 20px;
-      height: 20px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: #ffffff;
+      width: 18px;
+      height: 18px;
+      border: 3px solid rgba(0, 0, 0, 0.3);
+      border-top-color: #000;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: spin 0.7s linear infinite;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .error-box {
-      display: none;
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.4);
-      color: #fca5a5;
-      padding: 1rem;
-      border-radius: 12px;
-      font-size: 0.95rem;
-      margin-top: 1rem;
-    }
-
-    /* Zero-Gravity Animation Easter Egg */
-    @keyframes zeroGravityFloat {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-10px) rotate(0.4deg); }
-    }
-    body.antigravity-active .bento-card {
-      animation: zeroGravityFloat 4s ease-in-out infinite alternate;
-      box-shadow: 0 20px 45px rgba(255, 87, 34, 0.35);
-      border-color: rgba(255, 138, 101, 0.4);
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
   <div class="container">
+    
+    <div class="top-badge-row">
+      <div class="triad-badge">⚡ TRIAD ARCHITECTURE // CLAUDE • OPENCODE • ANTIGRAVITY</div>
+    </div>
+
     <header>
-      <div class="badge-bar">
-        <span>🔥 AI HACKATHON WAR-ROOM</span>
-        <span>•</span>
-        <span>TRIAD ARCHITECTURE: CLAUDE + OPENCODE + ANTIGRAVITY</span>
-      </div>
-      <h1>GitHub Roast &amp; Rescue</h1>
-      <p class="subtitle">Bento Dashboard • Honest developer roasts paired with actionable rescue plans</p>
+      <h1><span class="flame">ROAST</span> &amp; <span class="rescue">RESCUE</span></h1>
+      <p class="subtitle">Bento Dashboard • Zero corporate fluff. Brutal honesty + high-leverage developer advice.</p>
     </header>
 
-    <div class="input-bar">
+    <div class="search-box">
       <span class="input-prefix">@</span>
       <input type="text" id="usernameInput" placeholder="github-username (e.g. octocat, torvalds)" value="octocat" autocomplete="off" spellcheck="false">
       <button class="btn-roast" id="roastBtn" onclick="runRoast()">
         <span class="spinner" id="spinner"></span>
-        <span id="btnText">Roast &amp; Rescue</span>
+        <span id="btnText">ROAST NOW ⚡</span>
       </button>
     </div>
 
-    <div class="shortcuts-hint">
-      <span><span class="kbd">Enter</span> Run Analysis</span>
+    <div class="shortcuts-row">
+      <span><span class="kbd">Enter</span> Analyze</span>
       <span><span class="kbd">Ctrl</span>+<span class="kbd">K</span> Focus Input</span>
-      <span><span class="kbd">C</span> Copy Bento</span>
-      <span><span class="kbd">A</span> 🕊️ Anti-Gravity Mode</span>
+      <span><span class="kbd">C</span> Copy Terminal Layout</span>
     </div>
 
     <div class="error-box" id="errorBox"></div>
 
-    <div class="bento-grid" id="bentoDashboard">
-      <!-- 1. Recruiter Glance -->
+    <div class="bento-grid">
+      
+      <!-- 1. Recruiter Scan -->
       <div class="bento-card card-recruiter">
         <div class="card-header">
-          <div class="card-title" style="color: var(--accent-recruiter);">
-            <span>⏱️ 30-Second Recruiter Glance</span>
-          </div>
-          <span style="font-size: 0.75rem; color: #64748b;">Instant Hiring Lens</span>
+          <span class="badge-tag tag-cyan">⏱️ Recruiter Scan</span>
+          <span style="font-size: 0.75rem; color: #64748b; font-family: var(--font-mono);">30-SEC LENS</span>
         </div>
-        <div class="card-content" id="recruiterGlanceContent">Loading recruiter insights...</div>
+        <div class="recruiter-content" id="recruiterGlanceContent">Loading recruiter scan...</div>
       </div>
 
       <!-- 2. The Roast -->
       <div class="bento-card card-roast">
         <div class="card-header">
-          <div class="card-title" style="color: var(--accent-flame);">
-            <span>🌶️ The Roast</span>
-          </div>
-          <span style="font-size: 0.75rem; color: #f97316;">Humor Only</span>
+          <span class="badge-tag tag-orange">🔥 The Roast</span>
+          <span style="font-size: 0.75rem; color: #f97316; font-family: var(--font-mono);">PUNCHY WIT</span>
         </div>
-        <div class="card-content roast-quote" id="roastContent">Loading humorous observations...</div>
+        <div class="roast-quote-box" id="roastContent">Loading roast...</div>
       </div>
 
-      <!-- 3. The Rescue -->
+      <!-- 3. The Rescue Plan -->
       <div class="bento-card card-rescue">
         <div class="card-header">
-          <div class="card-title" style="color: var(--accent-rescue);">
-            <span>🛠️ The Rescue Plan</span>
-          </div>
-          <span style="font-size: 0.75rem; color: #10b981;">Prioritized Steps</span>
+          <span class="badge-tag tag-lime">🛟 The Rescue Plan</span>
+          <span style="font-size: 0.75rem; color: #10b981; font-family: var(--font-mono);">ACTION ROADMAP</span>
         </div>
-        <div class="card-content" id="rescueContent">Loading actionable growth roadmap...</div>
+        <div class="rescue-steps-grid" id="rescueStepsGrid">
+          <div class="step-card">
+            <div class="step-header">⚡ 10-Min Quick Win</div>
+            <div class="step-body" id="rescueStep1">Loading action...</div>
+          </div>
+          <div class="step-card">
+            <div class="step-header">🎯 Weekend Project</div>
+            <div class="step-body" id="rescueStep2">Loading action...</div>
+          </div>
+          <div class="step-card">
+            <div class="step-header">🚀 Career Growth</div>
+            <div class="step-body" id="rescueStep3">Loading action...</div>
+          </div>
+        </div>
       </div>
 
-      <!-- 4. Raw Bento Terminal Output -->
-      <div class="bento-card card-raw">
+      <!-- 4. Terminal ASCII Frame -->
+      <div class="bento-card card-terminal">
         <div class="card-header">
-          <div class="card-title">
-            <span>📺 Terminal Bento Layout</span>
-          </div>
-          <div style="display: flex; gap: 0.5rem;">
-            <button class="btn-copy" id="antiGravBtn" onclick="toggleAntiGravity()">🕊️ Fly Mode</button>
-            <button class="btn-copy" onclick="copyTerminalOutput()">Copy Bento Text</button>
-          </div>
+          <span class="badge-tag tag-purple">📺 Bento Terminal ASCII</span>
+          <button class="btn-brutal" id="copyBtn" onclick="copyTerminalOutput()">📋 Copy Terminal Layout</button>
         </div>
-        <div class="raw-terminal" id="rawOutput">Terminal format will appear here...</div>
+        <div class="terminal-box" id="rawOutput">Terminal format will appear here...</div>
       </div>
+
     </div>
 
-    <div class="disclaimer-badge">
-      Disclaimer: Roasts are lighthearted satire generated for entertainment. Focus on the Rescue roadmap for real profile improvements.
+    <div style="text-align: center; font-size: 0.78rem; color: #64748b; margin-top: 1rem; font-family: var(--font-mono);">
+      GitHub Roast &amp; Rescue • Built for AI Hackathon 2026 • Powered by Cloud Run
     </div>
   </div>
 
@@ -581,7 +644,7 @@ BENTO_WEB_HTML = """<!DOCTYPE html>
 
       errorBox.style.display = 'none';
       spinner.style.display = 'inline-block';
-      btnText.textContent = 'Roasting...';
+      btnText.textContent = 'ROASTING...';
       btn.disabled = true;
 
       try {
@@ -599,15 +662,27 @@ BENTO_WEB_HTML = """<!DOCTYPE html>
 
         document.getElementById('recruiterGlanceContent').textContent = data.recruiter_glance;
         document.getElementById('roastContent').textContent = data.roast;
-        document.getElementById('rescueContent').textContent = data.rescue;
         document.getElementById('rawOutput').textContent = data.bento_formatted || 'Bento layout generated.';
 
+        // Parse rescue into 3 clean cards
+        const rescueText = data.rescue || '';
+        const steps = rescueText.split(/\\n\\n+/);
+        if (steps.length >= 3) {
+          document.getElementById('rescueStep1').textContent = steps[0].replace(/^1\\.\\s*⚡[^:]*:\\s*/, '');
+          document.getElementById('rescueStep2').textContent = steps[1].replace(/^2\\.\\s*🎯[^:]*:\\s*/, '');
+          document.getElementById('rescueStep3').textContent = steps[2].replace(/^3\\.\\s*🚀[^:]*:\\s*/, '');
+        } else {
+          document.getElementById('rescueStep1').textContent = rescueText;
+          document.getElementById('rescueStep2').textContent = 'Polish top repo documentation and tags.';
+          document.getElementById('rescueStep3').textContent = 'Ship 1 pull request to an upstream open-source tool.';
+        }
+
       } catch (err) {
-        errorBox.textContent = 'Error: ' + err.message;
+        errorBox.textContent = 'ERROR: ' + err.message;
         errorBox.style.display = 'block';
       } finally {
         spinner.style.display = 'none';
-        btnText.textContent = 'Roast & Rescue';
+        btnText.textContent = 'ROAST NOW ⚡';
         btn.disabled = false;
       }
     }
@@ -615,15 +690,11 @@ BENTO_WEB_HTML = """<!DOCTYPE html>
     function copyTerminalOutput() {
       const text = document.getElementById('rawOutput').textContent;
       navigator.clipboard.writeText(text).then(() => {
-        alert('Copied Bento terminal output to clipboard!');
+        const btn = document.getElementById('copyBtn');
+        const orig = btn.textContent;
+        btn.textContent = '✅ COPIED!';
+        setTimeout(() => { btn.textContent = orig; }, 2000);
       });
-    }
-
-    function toggleAntiGravity() {
-      document.body.classList.toggle('antigravity-active');
-      const active = document.body.classList.contains('antigravity-active');
-      const btn = document.getElementById('antiGravBtn');
-      if (btn) btn.textContent = active ? '🪂 Normal Gravity' : '🕊️ Fly Mode';
     }
 
     // Keyboard Shortcuts
@@ -635,8 +706,6 @@ BENTO_WEB_HTML = """<!DOCTYPE html>
         runRoast();
       } else if (e.key.toLowerCase() === 'c' && document.activeElement !== document.getElementById('usernameInput')) {
         copyTerminalOutput();
-      } else if (e.key.toLowerCase() === 'a' && document.activeElement !== document.getElementById('usernameInput')) {
-        toggleAntiGravity();
       }
     });
 
@@ -664,6 +733,9 @@ class RoastHandler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", "0")
         self.end_headers()
 
     def do_OPTIONS(self):

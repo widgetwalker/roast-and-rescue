@@ -46,184 +46,58 @@ def _generate_recruiter_glance(
     repos: List[Dict[str, Any]],
     events: Optional[List[Dict[str, Any]]] = None
 ) -> str:
-    """Generate a 30-second recruiter glance summary incorporating activity."""
+    """Generate a 3-bullet instant recruiter scan."""
     lang_summary = _format_languages(repos)
     total_repos = len(repos)
+    followers = _safe_get(profile, 'followers', 0)
+    created = (_safe_get(profile, "created_at", "") or "recently")[:10]
 
-    name = _safe_get(profile, "name") or _safe_get(profile, "username") or "Unknown"
-    bio = _safe_get(profile, "bio") or "general development"
-    created = _safe_get(profile, "created_at", "")
-    date = created.split("T")[0] if created else "recently"
+    has_recent_pushes = bool(events and any(isinstance(e, dict) and e.get("type") == "PushEvent" for e in events))
+    activity_note = "Active push cadence in recent events" if has_recent_pushes else "Quiet recent activity feed"
 
-    items = [
-        f"{name} is a developer working primarily with {lang_summary}",
-        f"They have {_safe_get(profile, 'followers', 0)} followers and {total_repos} public repositories",
-        f"Their projects range from {_classify_activity(total_repos)}, showing a focus on {bio}",
-        f"Active since {date}",
+    lines = [
+        f"• Tech Stack : {lang_summary}",
+        f"• Footprint  : {total_repos} public repos | {followers:,} followers (active since {created})",
+        f"• Pulse      : {activity_note}",
     ]
-
-    if events:
-        push_events = [e for e in events if isinstance(e, dict) and e.get("type") == "PushEvent"]
-        if push_events:
-            items.append(f"Recent cadence: {len(push_events)} pushes recorded in latest activity feed")
-
-    return "\n".join(items)
+    return "\n".join(lines)
 
 
 def _generate_roast(profile: Dict[str, Any], repos: List[Dict[str, Any]]) -> str:
-    """Generate a humorous-but-not-cruel roast of the GitHub profile."""
+    """Generate a punchy, sharp, witty roast (no comic gimmicks)."""
     username = _safe_get(profile, "username", "").lower()
-    if username == "antigravity":
-        return """🕊️ You literally imported antigravity and started flying! What is there to roast?
-Your code defies all standard gravitational and runtime constraints (xkcd #353).
-May your flight ceiling remain infinite and your dependencies weightless!
-
----
-*Roast for entertainment only. See the "Rescue" section below for actual improvement advice.*"""
-
-    roast_parts = []
-
-    repos_count = len(repos) if repos else 0
-
-    if repos_count == 0:
-        roast_parts.append("Maintains an impressively empty repository list - dedication to the minimalist lifestyle!")
-    elif repos_count < 3:
-        roast_parts.append("Quality over quantity, we presume - a noble philosophy, though the portfolio could use some bulking up")
-    else:
-        roast_parts.append(f"Manages {repos_count} repos - impressive, though we hope some of them aren't just 'todo-list-app' clones")
-
+    total_repos = len(repos) if repos else 0
     bio = _safe_get(profile, "bio", "")
+    followers = _safe_get(profile, "followers", 0)
+
+    if username == "antigravity":
+        return "Zero repos, 5 followers, and absolute physics-defying audacity. Floating entirely above the commit grind."
+
+    if total_repos == 0:
+        return f"@{username}'s profile is cleaner than an empty operating system install. Minimalist aesthetic, or did you git push directly into the void?"
+
+    if followers > 50000:
+        return f"@{username} has {followers:,} developers watching every commit like a stadium crowd, yet the profile bio is still empty. When your code speaks for itself, who needs documentation?"
+
     if not bio or bio == "No bio set":
-        roast_parts.append("A bio-less profile - the mystery writer approach, or just still working on the 'About Me' chapter?")
-    elif len(bio) < 20:
-        roast_parts.append(f"Very brief bio: '{bio}' - we respect the brevity, but recruiters love context")
-    else:
-        roast_parts.append(f"Bio length: {len(bio)} chars - someone either has a lot to say or really loves their pet's name")
+        return f"{total_repos} repositories and not a single sentence in the bio. You treat your developer identity like a classified intelligence dossier."
 
-    company = _safe_get(profile, "company", "")
-    if not company or company == "Not specified":
-        roast_parts.append("Currently 'Not specified' at their company - perhaps between startups or just very private about their day job")
+    if len(bio) < 25:
+        return f"'{bio}' — we love the brevity, but your bio looks like a placeholder comment you forgot to remove before deploying to production."
 
-    return f"""{" ".join(roast_parts)}
-
----
-*Roast for entertainment only. See the "Rescue" section below for actual improvement advice.*"""
+    return f"{total_repos} public repos and '{bio}'. Looks like a graveyard of ambitious weekend side-projects where todos go to rest in peace."
 
 
 def _generate_rescue(profile: Dict[str, Any], repos: List[Dict[str, Any]], roast: str) -> str:
-    """Generate specific, actionable improvement advice (the "rescue")."""
-    quick_wins = []
-    medium_goals = []
-    long_term = []
+    """Generate 3 bite-sized, high-leverage steps that are easy to digest."""
+    top_repo = repos[0].get("name", "top repository") if repos else "primary project"
 
-    repos_count = len(repos) if repos else 0
-
-    # Quick win 1: Bio
-    if not _safe_get(profile, "bio"):
-        quick_wins.append({
-            "priority": "Quick Win",
-            "action": "Write a compelling bio",
-            "details": "Add 2-3 sentences about what you build, what you're learning, or what you're passionate about. Recruiters scan bios first.",
-            "impact": "High - immediately makes profile more engaging"
-        })
-    else:
-        quick_wins.append({
-            "priority": "Quick Win",
-            "action": "Optimize existing bio",
-            "details": "Make sure your bio clearly states your role, key skills, and what you're working on. Keep it under 200 chars for mobile viewing.",
-            "impact": "High - improves discoverability"
-        })
-
-    # Quick win 2: Profile picture
-    quick_wins.append({
-        "priority": "Quick Win",
-        "action": "Add a professional profile picture",
-        "details": "Use a clear, friendly headshot with good lighting. Profiles with photos get significantly more profile views.",
-        "impact": "Medium - first impression matters"
-    })
-
-    # Quick win 3: Feature best repo if few repos
-    if 0 < repos_count < 5:
-        quick_wins.append({
-            "priority": "Quick Win",
-            "action": "Feature your best repository",
-            "details": "Pin your highest-starred or most relevant repo to your profile. Add a README with clear usage instructions and project goals.",
-            "impact": "High - shows, don't just tell"
-        })
-
-    # Medium-term: Strongest language/stack
-    lang = _safe_get(profile, "primary_language", "")
-    if not lang and repos_count > 0:
-        medium_goals.append({
-            "priority": "Medium-term Goal",
-            "action": "Identify and showcase your strongest language/stack",
-            "details": "Review your repos and identify which language/tech stack appears most frequently. Highlight this prominently in your profile and README files.",
-            "impact": "Medium - clarifies your brand as a developer"
-        })
-
-    # Medium-term: READMEs for top repos
-    if repos_count > 0:
-        medium_goals.append({
-            "priority": "Medium-term Goal",
-            "action": "Add comprehensive READMEs to top 3 repositories",
-            "details": "Every repo should have: Problem statement, Setup instructions, Usage examples, Tech stack, Screenshots/GIFs. This is the #1 thing reviewers look for.",
-            "impact": "High - professionalizes every repository"
-        })
-
-    # Long-term: Open source contribution
-    long_term.append({
-        "priority": "Long-term Growth",
-        "action": "Contribute to open source projects",
-        "details": "Find projects matching your stack and contribute bug fixes, documentation, or features. Even 2-3 contributions builds credibility and network.",
-        "impact": "High - expands visibility and network"
-    })
-
-    # Long-term: Consistent posting
-    long_term.append({
-        "priority": "Long-term Growth",
-        "action": " consistent posting schedule",
-        "details": "Share your projects on Twitter/X, dev.to, or LinkedIn with 1-2 posts per week. Drive traffic back to your GitHub. Consistent visibility beats viral spikes.",
-        "impact": "Medium - builds personal brand"
-    })
-
-    # Format the output
-    output_parts = []
-
-    output_parts.append("=" * 60)
-    output_parts.append("  THE RESCUE - Actionable Improvement Plan")
-    output_parts.append("=" * 60)
-    output_parts.append("")
-
-    output_parts.append("🚀 QUICK WINS (fix these TODAY):")
-    output_parts.append("-" * 40)
-    for item in quick_wins:
-        output_parts.append(f"  [{item['priority']}] {item['action']}")
-        output_parts.append(f"    → {item['details']}")
-        output_parts.append(f"    → Impact: {item['impact']}")
-        output_parts.append("")
-
-    output_parts.append("📈 MEDIUM-TERM GOALS (weeks of work):")
-    output_parts.append("-" * 40)
-    for item in medium_goals:
-        output_parts.append(f"  [{item['priority']}] {item['action']}")
-        output_parts.append(f"    → {item['details']}")
-        output_parts.append(f"    → Impact: {item['impact']}")
-        output_parts.append("")
-
-    output_parts.append("🌟 LONG-TERM GROWTH (months of consistent effort):")
-    output_parts.append("-" * 40)
-    for item in long_term:
-        output_parts.append(f"  [{item['priority']}] {item['action']}")
-        output_parts.append(f"    → {item['details']}")
-        output_parts.append(f"    → Impact: {item['impact']}")
-        output_parts.append("")
-
-    output_parts.append("=" * 60)
-    output_parts.append("  REMEMBER: The roast above is for entertainment.")
-    output_parts.append("  Focus on the rescue items for real improvement!")
-    output_parts.append("=" * 60)
-
-    return "\n".join(output_parts)
+    steps = [
+        f"1. ⚡ 10-MIN QUICK WIN:\n   Pin your best repo ('{top_repo}') and write a 1-sentence bio stating what you actually build.",
+        f"2. 🎯 WEEKEND PROJECT:\n   Add a live demo GIF and a 3-step quickstart in '{top_repo}'s README.",
+        "3. 🚀 CAREER GROWTH:\n   Add descriptive GitHub topic tags to your repos and ship 1 pull request to an upstream open-source tool."
+    ]
+    return "\n\n".join(steps)
 
 
 def analyze_profile(

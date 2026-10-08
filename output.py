@@ -23,67 +23,56 @@ LAYOUT = {
 }
 
 
-def bento_layout(sections: Dict[str, str], width: int = 80) -> str:
-    """Format output using Bento Style grid layout.
-
-    Bento Style organizes content into a grid of cells, like a bento box.
-    Each section gets its own cell with clear partitioning.
+def bento_layout(sections: Dict[str, str], width: int = 76) -> str:
+    """Format output using a clean, readable Neo-Brutalist Bento terminal frame.
 
     Args:
         sections: Dictionary of section_name -> content_string
-        width: Maximum width for each cell
+        width: Maximum width for box borders
 
     Returns:
         Formatted string ready for terminal output
     """
     lines = []
+    inner_w = width - 4
 
-    # Header
-    lines.append("=" * width)
-    lines.append("  GITHUB ROAST & RESCUE")
-    lines.append("  Honest feedback with actionable improvement advice")
-    lines.append("=" * width)
-    lines.append("")
+    titles = {
+        "recruiter_glance": ("⏱️  RECRUITER SCAN", "─"),
+        "roast": ("🔥  THE ROAST", "─"),
+        "rescue": ("🛟  THE RESCUE PLAN", "─"),
+    }
 
-    # Layout sections in a grid
-    # Bento Style: typically 2-column or asymmetric grid
-    # Here we stack vertically with clear separators
-    section_names = list(sections.keys())
+    for name, content in sections.items():
+        title_text, fill_char = titles.get(name, (f"📌  {name.upper()}", "─"))
+        
+        # Brutalist block header
+        header_line = f"┌── {title_text} "
+        if len(header_line) < width:
+            header_line += fill_char * (width - len(header_line) - 1) + "┐"
+        else:
+            header_line = header_line[:width-1] + "┐"
+        
+        lines.append("")
+        lines.append(header_line)
 
-    for i, (name, content) in enumerate(sections.items()):
-        # Section header
-        lines.append("-" * width)
-        # Pad section name
-        padded_name = f"  {name.upper()}  "
-        lines.append(padded_name.center(width, "─"))
+        # Content lines
+        for raw_line in content.split("\n"):
+            if not raw_line.strip():
+                lines.append(f"│  ")
+                continue
 
-        # Section content - wrap at width-4 for padding
-        content_lines = content.split("\n")
-        for line in content_lines:
-            # Wrap long lines
-            if len(line) > width - 4:
-                words = line.split(" ")
-                current_line = ""
-                for word in words:
-                    if len(current_line + word) <= width - 4:
-                        current_line += word + " "
-                    else:
-                        lines.append(f"  {current_line.strip()}")
-                        current_line = word + " "
-                if current_line.strip():
-                    lines.append(f"  {current_line.strip()}")
-            else:
-                lines.append(f"  {line}")
+            words = raw_line.split(" ")
+            curr = ""
+            for w in words:
+                if len(curr) + len(w) + 1 <= inner_w:
+                    curr += (" " if curr else "") + w
+                else:
+                    lines.append(f"│  {curr.ljust(inner_w)} │")
+                    curr = w
+            if curr:
+                lines.append(f"│  {curr.ljust(inner_w)} │")
 
-        # Add a small gap between sections (except last)
-        if i < len(section_names) - 1:
-            lines.append("")
-
-    # Footer
-    lines.append("=" * width)
-    lines.append("  Roast for entertainment only - focus on the rescue for real improvement")
-    lines.append("=" * width)
-    lines.append("")
+        lines.append("└──" + "─" * (width - 4) + "┘")
 
     return "\n".join(lines)
 
@@ -229,12 +218,21 @@ def format_output(analysis: Dict[str, Any]) -> None:
     }
 
     # Print the full Bento Style layout
-    output = bento_layout(sections, width=80)
+    width = 76
+    output = bento_layout(sections, width=width)
 
-    # Print with username header
-    print(f"\n🔍 Roasting GitHub profile: @{username}")
-    print("=" * 80)
+    # Brutalist Title Card
+    inner_title_len = width - 36
+    clean_user = username.upper()[:inner_title_len].ljust(inner_title_len)
+    title_box = [
+        f"┌{'─' * (width - 2)}┐",
+        f"│  🔥 GITHUB ROAST & RESCUE  ::  @{clean_user} │",
+        f"└{'─' * (width - 2)}┘",
+    ]
+
+    print("\n" + "\n".join(title_box))
     print(output)
+    print(f"\n⚡ Built with Claude + OpenCode + Antigravity\n")
 
 
 def main():
