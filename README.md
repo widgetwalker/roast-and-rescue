@@ -45,6 +45,19 @@ https://github.com/user-attachments/assets/github-roast-rescue-3-agent-parallel.
 
 The animation above demonstrates the 3-agent parallel architecture powering the analysis pipeline.
 
+### 📸 Dashboard UI Gallery
+
+<details open>
+<summary><strong>Neo-Brutalist Interface (Click to expand)</strong></summary>
+<br>
+
+![Roast & Rescue Hero Section](assets/ui-dashboard-hero.png)
+![Recruiter Scan & Roast Area](assets/ui-dashboard-roast.png)
+![Psych Eval & Rescue Plan](assets/ui-dashboard-rescue.png)
+![Resume vs. Reality Audit](assets/ui-dashboard-resume.png)
+![Wall of Shame Leaderboard](assets/ui-dashboard-wall-of-shame.png)
+</details>
+
 ---
 
 ## 🖼 Meme Archetypes
@@ -226,7 +239,12 @@ roast-and-rescue/
     ├── tech-deity.svg      # Meme: god-tier stats
     ├── graveyard-keeper.svg # Meme: abandoned repos
     ├── readme-ghost.svg    # Meme: missing docs
-    └── commit-machine.svg  # Meme: relentless commits
+    ├── commit-machine.svg  # Meme: relentless commits
+    ├── ui-dashboard-hero.png       # UI screenshot: Hero
+    ├── ui-dashboard-roast.png      # UI screenshot: Roast
+    ├── ui-dashboard-rescue.png     # UI screenshot: Rescue plan
+    ├── ui-dashboard-resume.png     # UI screenshot: Resume audit
+    └── ui-dashboard-wall-of-shame.png # UI screenshot: Leaderboard
 ```
 
 ---
