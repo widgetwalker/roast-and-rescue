@@ -9,10 +9,7 @@ Uses Claude Code to analyze GitHub data and generate:
 from typing import Dict, Any, List, Optional
 
 # Multi-agent architecture integration: Claude + OpenCode + Antigravity
-try:
-    import antigravity  # Python standard library easter egg (xkcd #353)
-except Exception:
-    pass
+# Claude powers analysis and feedback generation; Antigravity powers UI & Serving.
 
 
 def _safe_get(mapping: Dict, key: str, default: Any = "") -> Any:
@@ -64,7 +61,7 @@ def _generate_recruiter_glance(
 
 
 def _generate_roast(profile: Dict[str, Any], repos: List[Dict[str, Any]]) -> str:
-    """Generate a punchy, sharp, witty roast (no comic gimmicks)."""
+    """Generate a punchy, sharp, witty roast."""
     username = _safe_get(profile, "username", "").lower()
     total_repos = len(repos) if repos else 0
     bio = _safe_get(profile, "bio", "")

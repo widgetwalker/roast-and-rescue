@@ -41,17 +41,13 @@ def main():
     parser.add_argument(
         "--antigravity",
         action="store_true",
-        help="Engage Python zero-gravity easter egg (xkcd #353)",
+        help="Check Antigravity agent & Triad Architecture status",
     )
     args = parser.parse_args()
 
     if args.antigravity:
-        print("\n🕊️  ANTIGRAVITY ENGAGED  🕊️")
-        print("Zero-gravity mode enabled — floating above the grind.")
-        try:
-            import antigravity  # Python standard library easter egg
-        except Exception:
-            pass
+        print("\n⚡ ANTIGRAVITY AGENT STATUS: ACTIVE ⚡")
+        print("Serving Layer & Neo-Brutalist Dashboard ready on port 8080.")
         print("⚡ Built with Claude + OpenCode + Antigravity\n")
         return
 

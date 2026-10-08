@@ -28,7 +28,7 @@ def _get_auth_headers() -> dict:
     return {"Accept": "application/vnd.github+v3+json"}
 
 
-def _make_request(url: str, params: dict = None) -> Optional[requests.Response]:
+def _make_request(url: str, params: Optional[Dict[str, Any]] = None) -> Optional[requests.Response]:
     """Make a GET request to GitHub API.
 
     Args:

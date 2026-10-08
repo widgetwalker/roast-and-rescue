@@ -5,7 +5,7 @@
     <img src="https://img.shields.io/badge/Vibe-Immaculate-blue?style=for-the-badge" alt="Vibe" />
     <img src="https://img.shields.io/badge/Architecture-Cloud%20Run-orange?style=for-the-badge" alt="Arch" />
     <img src="https://img.shields.io/badge/Style-Bento%20Box-green?style=for-the-badge" alt="Style" />
-    <img src="https://img.shields.io/badge/Easter_Egg-import_antigravity-9cf?style=for-the-badge" alt="Easter Egg" />
+    <img src="https://img.shields.io/badge/Agent-Antigravity-9cf?style=for-the-badge" alt="Antigravity Agent" />
   </p>
 </div>
 
@@ -69,20 +69,20 @@ This project was built during an 8-hour hackathon utilizing three parallel AI ag
 
 ---
 
-## 🕊️ Antigravity Easter Egg (xkcd #353)
+## ⚡ Antigravity Triad Integration
 
-Mandatory hackathon requirement: Python's iconic standard library easter egg `import antigravity` is fully baked in!
+The project architecture features the 3-agent triad required by the hackathon plan:
 
-- **CLI Easter Egg:**
+- **CLI Status Check:**
   ```bash
   python main.py --antigravity
   ```
-  *Defies code gravity with a special comic greeting.*
+  *Prints status of the Antigravity serving layer and triad components.*
 
 - **Web Dashboard Zero-Gravity Mode:**
   Visit the dashboard at `http://localhost:8080/` and press `A` (or click **🕊️ Fly Mode**) to activate floating card animations!
 
-- **Cloud Run Easter Egg Endpoint:**
+- **Cloud Run Agent Endpoint:**
   ```bash
   curl http://localhost:8080/antigravity
   ```

@@ -17,13 +17,12 @@ import traceback
 from http import HTTPStatus
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
+from typing import Dict, Any, Optional, List
+
 USERNAME_REGEX = re.compile(r"^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$")
 
 # Multi-agent architecture integration: Claude + OpenCode + Antigravity
-try:
-    import antigravity  # Python standard library easter egg (xkcd #353)
-except Exception:
-    pass
+# Antigravity serves as the HTTP / Cloud Run backend & Bento UI agent.
 
 # Attempt to import core modules with graceful fallback if in-progress by other agents
 def get_analyzer_fn():
@@ -38,7 +37,12 @@ def get_analyzer_fn():
         pass
 
     # Built-in fallback analyzer if sibling agent is actively recompiling analyzer.py
-    def fallback_analyze(profile: Dict[str, Any], repos: Any, username: str) -> Dict[str, Any]:
+    def fallback_analyze(
+        profile: Dict[str, Any],
+        repos: Any,
+        username: str,
+        events_data: Optional[List[Dict[str, Any]]] = None
+    ) -> Dict[str, Any]:
         repos_list = repos if isinstance(repos, list) else []
         repo_count = len(repos_list)
         langs = []
@@ -52,34 +56,20 @@ def get_analyzer_fn():
         followers = profile.get("followers", 0)
 
         glance = (
-            f"• {name} (@{username}) primarily builds with {lang_str}\n"
-            f"• Maintains {repo_count} public repositories with {followers} followers\n"
-            f"• Profile focus: {bio}\n"
-            f"• Account created: {profile.get('created_at', 'recently')[:10] if profile.get('created_at') else 'recently'}"
+            f"• Tech Stack : {lang_str}\n"
+            f"• Footprint  : {repo_count} public repos | {followers:,} followers\n"
+            f"• Profile    : {bio}"
         )
 
         roast = (
-            f"@{username} manages {repo_count} public repositories – dedication to the minimalist code aesthetic!\n"
-            f"With '{bio}', you're either a mysterious 10x architect or saving the bio for the IPO.\n"
-            f"Favorite stack appears to be {lang_str}. May your merge conflicts be few and your coffee strong."
+            f"@{username} manages {repo_count} public repositories with '{bio}'. "
+            f"Either you're a stealth architect or saving the bio for the IPO."
         )
 
         rescue = (
-            "🚀 QUICK WINS (fix these TODAY):\n"
-            "  [Quick Win] Enhance your GitHub profile README\n"
-            "    → Add a profile README (username/username) summarizing current projects & stack\n"
-            "    → Impact: High - first impression for recruiters\n\n"
-            "  [Quick Win] Add descriptive tags & topics to your top 3 repos\n"
-            "    → Enable GitHub repo topics to boost discoverability in search\n"
-            "    → Impact: Medium - increases inbound traffic\n\n"
-            "📈 MEDIUM-TERM GOALS (weeks of work):\n"
-            "  [Medium-term] Standardize repository READMEs with demo GIFs & badges\n"
-            "    → Include setup instructions, quickstarts, and live demo links\n"
-            "    → Impact: High - converts casual visitors into stargazers\n\n"
-            "🌟 LONG-TERM GROWTH (months of consistent effort):\n"
-            "  [Long-term] Active open-source contribution in your core stack\n"
-            "    → Submit PRs to active upstream repositories in " + lang_str + "\n"
-            "    → Impact: High - establishes public industry credibility"
+            f"1. ⚡ 10-MIN QUICK WIN:\n   Pin your best repo and write a 1-sentence bio.\n\n"
+            f"2. 🎯 WEEKEND PROJECT:\n   Add a live demo GIF and quickstart to your top repo's README.\n\n"
+            f"3. 🚀 CAREER GROWTH:\n   Ship 1 pull request to an upstream open-source tool."
         )
 
         return {
@@ -103,21 +93,27 @@ def get_github_client():
         # Fallback inline client using requests
         import requests
         class FallbackGitHubClient:
-            def get_user_profile(self, username: str) -> Dict[str, Any]:
+            def get_user_profile(self, username: str) -> Optional[Dict[str, Any]]:
                 r = requests.get(f"https://api.github.com/users/{username}", headers={"Accept": "application/vnd.github+v3+json"}, timeout=10)
                 if r.status_code == 404:
-                    raise ValueError(f"User '{username}' not found on GitHub")
+                    return None
                 elif r.status_code != 200:
                     raise RuntimeError(f"GitHub API error: {r.status_code}")
                 return r.json()
 
-            def get_user_repos(self, username: str, per_page: int = 10, sort: str = "stars") -> Any:
+            def get_user_repos(self, username: str, per_page: int = 10, sort: str = "stars") -> Optional[List[Dict[str, Any]]]:
                 r = requests.get(f"https://api.github.com/users/{username}/repos", params={"per_page": per_page, "sort": sort}, headers={"Accept": "application/vnd.github+v3+json"}, timeout=10)
                 if r.status_code == 404:
-                    raise ValueError(f"User '{username}' not found on GitHub")
+                    return []
                 elif r.status_code != 200:
                     raise RuntimeError(f"GitHub API error: {r.status_code}")
                 return r.json()
+
+            def get_recent_activity(self, username: str, limit: int = 5) -> Optional[List[Dict[str, Any]]]:
+                r = requests.get(f"https://api.github.com/users/{username}/events", params={"per_page": limit}, headers={"Accept": "application/vnd.github+v3+json"}, timeout=10)
+                if r.status_code == 404:
+                    return []
+                return r.json() if r.status_code == 200 else []
         return FallbackGitHubClient()
 
 
@@ -759,14 +755,12 @@ class RoastHandler(BaseHTTPRequestHandler):
         elif self.path in ("/antigravity", "/api/antigravity"):
             self._set_headers(200, "application/json")
             resp = {
-                "status": "flying",
-                "easter_egg": "xkcd #353",
-                "comic_url": "https://xkcd.com/353/",
-                "quote": "“I wrote 20 lines of code in Python and now I'm flying!” — xkcd #353",
+                "status": "active",
+                "easter_egg": "antigravity",
                 "agents": {
                     "claude": "AI Analysis & Prompt Architecture",
                     "opencode": "GitHub REST API Client & Rate-Limit Handling",
-                    "antigravity": "Cloud Run Server & Zero-Gravity Interactive UI"
+                    "antigravity": "Cloud Run Server & Neo-Brutalist Dashboard"
                 }
             }
             self.wfile.write(json.dumps(resp).encode("utf-8"))

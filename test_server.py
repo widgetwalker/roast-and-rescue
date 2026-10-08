@@ -89,9 +89,10 @@ def run_tests():
         req = urllib.request.urlopen(f"{base_url}/antigravity", timeout=5)
         assert req.status == 200
         anti_data = json.loads(req.read().decode())
-        assert anti_data["status"] == "flying"
-        assert "xkcd" in anti_data["easter_egg"]
-        print("PASSED 🕊️ ✅")
+        assert anti_data["status"] == "active"
+        assert anti_data["easter_egg"] == "antigravity"
+        assert "claude" in anti_data["agents"]
+        print("PASSED ⚡ ✅")
 
         print("\nAll Cloud Run server tests PASSED! 🚀")
         return True
