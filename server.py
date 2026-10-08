@@ -43,33 +43,33 @@ def get_analyzer_fn():
         username: str,
         events_data: Optional[List[Dict[str, Any]]] = None
     ) -> Dict[str, Any]:
+        try:
+            import analyzer
+            return analyzer.analyze_profile(profile, repos if isinstance(repos, list) else [], username, events_data=events_data)
+        except Exception:
+            pass
+
         repos_list = repos if isinstance(repos, list) else []
         repo_count = len(repos_list)
-        langs = []
-        for r in repos_list[:5]:
-            l = r.get("primary_language") if isinstance(r, dict) else None
-            if l and l not in langs:
-                langs.append(l)
-        lang_str = ", ".join(langs[:3]) if langs else "Various technologies"
-        name = profile.get("name") or profile.get("username") or username
+        langs = [r.get("primary_language") for r in repos_list if isinstance(r, dict) and r.get("primary_language")]
+        lang_str = ", ".join(list(set(filter(None, langs)))[:3]) if langs else "Code"
         bio = profile.get("bio") or "No bio provided"
         followers = profile.get("followers", 0)
 
         glance = (
-            f"• Tech Stack : {lang_str}\n"
+            f"• Core Stack : {lang_str}\n"
             f"• Footprint  : {repo_count} public repos | {followers:,} followers\n"
             f"• Profile    : {bio}"
         )
-
         roast = (
+            f"🔥 ARCHETYPE: The Stealth Builder\n\n"
             f"@{username} manages {repo_count} public repositories with '{bio}'. "
             f"Either you're a stealth architect or saving the bio for the IPO."
         )
-
         rescue = (
-            f"1. ⚡ 10-MIN QUICK WIN:\n   Pin your best repo and write a 1-sentence bio.\n\n"
-            f"2. 🎯 WEEKEND PROJECT:\n   Add a live demo GIF and quickstart to your top repo's README.\n\n"
-            f"3. 🚀 CAREER GROWTH:\n   Ship 1 pull request to an upstream open-source tool."
+            f"1. ⚡ 10-MIN QUICK WIN:\n   Pin your best {lang_str} repository and write a 1-sentence bio stating what you actually build.\n\n"
+            f"2. 🎯 WEEKEND PROJECT:\n   Add an animated demo GIF, quickstart code block, and badges to your top repo's README.\n\n"
+            f"3. 🚀 CAREER LEVERAGE:\n   Ship 1 reviewed pull request to an upstream open-source project."
         )
 
         return {

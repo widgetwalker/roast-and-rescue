@@ -21,11 +21,21 @@ from typing import Dict, List, Any, Optional
 
 
 def _get_auth_headers() -> dict:
-    """Get authentication headers if GITHUB_TOKEN is set."""
+    """Get authentication headers if GITHUB_TOKEN is set or available via gh CLI."""
     token = os.environ.get("GITHUB_TOKEN")
+    if not token:
+        try:
+            import subprocess
+            token = subprocess.check_output(["gh", "auth", "token"], stderr=subprocess.DEVNULL, timeout=2).decode().strip()
+            if token:
+                os.environ["GITHUB_TOKEN"] = token
+        except Exception:
+            pass
+
+    headers = {"Accept": "application/vnd.github+v3+json", "User-Agent": "GitHub-Roast-And-Rescue/1.0"}
     if token:
-        return {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+v3+json"}
-    return {"Accept": "application/vnd.github+v3+json"}
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
 
 
 def _make_request(url: str, params: Optional[Dict[str, Any]] = None) -> Optional[requests.Response]:
@@ -236,18 +246,27 @@ def format_repo_summary(repos: List[Dict[str, Any]]) -> Dict[str, Any]:
     if not repos:
         return {"top_repos": [], "total_fetched": 0}
 
-    # Sort by stars and take top 10
-    sorted_repos = sorted(repos, key=lambda r: r.get("stargazers_count", 0), reverse=True)[:10]
+    # Sort by stars and take up to 20
+    sorted_repos = sorted(repos, key=lambda r: r.get("stargazers_count", 0), reverse=True)[:20]
 
     summary = []
     for repo in sorted_repos:
+        license_info = repo.get("license")
+        spdx = license_info.get("spdx_id") if isinstance(license_info, dict) else None
         summary.append({
             "name": repo.get("name", "unknown"),
-            "description": repo.get("description") or "No description",
+            "description": repo.get("description") or "",
             "stars": repo.get("stargazers_count", 0),
             "forks": repo.get("forks_count", 0),
+            "is_fork": bool(repo.get("fork", False)),
+            "open_issues": repo.get("open_issues_count", 0),
+            "topics": repo.get("topics", []) if isinstance(repo.get("topics"), list) else [],
+            "license": spdx,
+            "archived": bool(repo.get("archived", False)),
+            "homepage": repo.get("homepage") or "",
             "primary_language": repo.get("language") or "Unknown",
             "last_push": repo.get("pushed_at", "never"),
+            "created_at": repo.get("created_at", ""),
             "url": repo.get("html_url", ""),
         })
 
@@ -267,6 +286,9 @@ def format_profile_summary(profile: Optional[Dict[str, Any]]) -> Dict[str, Any]:
             "followers": 0,
             "following": 0,
             "public_repos": 0,
+            "public_gists": 0,
+            "hireable": False,
+            "twitter_username": "",
             "created_at": "",
             "html_url": "",
         }
@@ -281,6 +303,9 @@ def format_profile_summary(profile: Optional[Dict[str, Any]]) -> Dict[str, Any]:
         "followers": profile.get("followers", 0),
         "following": profile.get("following", 0),
         "public_repos": profile.get("public_repos", 0),
+        "public_gists": profile.get("public_gists", 0),
+        "hireable": bool(profile.get("hireable", False)),
+        "twitter_username": profile.get("twitter_username") or "",
         "created_at": profile.get("created_at", ""),
         "html_url": profile.get("html_url", ""),
     }
