@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "10f635dc-e973-4fd6-985d-28aa8c069c8c",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "/home/widget/Projects/roast-and-rescue/.archify/workflow-roast-and-rescue-20261008-105100/candidate.json",
+  "output": "/home/widget/Projects/roast-and-rescue/.archify/workflow-roast-and-rescue-20261008-105100/roast-and-rescue.html",
+  "specification": {
+    "sha256": "6d9c5320f458866a3b2ac761d621a73b43371149b01d3e1a971c19c492d1a917",
+    "bytes": 4035
+  },
+  "artifact": {
+    "sha256": "e2704c053e680521add53b91fd14044a84c7a1949bdee0e25fd06d5056d52db9",
+    "bytes": 767808
+  }
+}

@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment & Secrets
+.env
+.env.local
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editor / OS artifacts
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/
