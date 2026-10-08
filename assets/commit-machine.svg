@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="480" viewBox="0 0 400 480">
+  <defs>
+    <pattern id="half4" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(-30)">
+      <circle cx="6" cy="6" r="3.1" fill="#000"/>
+    </pattern>
+    <filter id="grit4">
+      <feTurbulence type="fractalNoise" baseFrequency="0.88" numOctaves="3" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.36 0"/>
+      <feComposite operator="over" in2="SourceGraphic"/>
+    </filter>
+    <filter id="copy4">
+      <feTurbulence type="turbulence" baseFrequency="0.05" numOctaves="4" result="t"/>
+      <feDisplacementMap in="SourceGraphic" in2="t" scale="6"/>
+    </filter>
+  </defs>
+  <rect x="4" y="4" width="392" height="472" fill="#fff" stroke="#000" stroke-width="8"/>
+  <rect x="28" y="28" width="344" height="320" fill="#fff" stroke="#000" stroke-width="6"/>
+  <rect x="28" y="28" width="344" height="320" fill="url(#half4)" opacity="0.25"/>
+  <g filter="url(#copy4)">
+    <!-- robot head -->
+    <rect x="120" y="110" width="160" height="130" fill="#fff" stroke="#000" stroke-width="10"/>
+    <rect x="120" y="110" width="160" height="34" fill="#000"/>
+    <circle cx="160" cy="180" r="22" fill="#000"/>
+    <circle cx="240" cy="180" r="22" fill="#000"/>
+    <circle cx="160" cy="180" r="8" fill="#ffff00"/>
+    <circle cx="240" cy="180" r="8" fill="#ffff00"/>
+    <rect x="175" y="212" width="50" height="12" fill="#000"/>
+    <!-- antenna -->
+    <line x1="200" y1="110" x2="200" y2="70" stroke="#000" stroke-width="8"/>
+    <circle cx="200" cy="60" r="14" fill="#000"/>
+    <!-- body keys -->
+    <rect x="140" y="250" width="120" height="60" fill="#000"/>
+    <g font-family="monospace" font-weight="900" font-size="20" fill="#00ff00" text-anchor="middle">
+      <text x="165" y="278">git</text>
+      <text x="215" y="278">push</text>
+      <text x="190" y="300">--force</text>
+    </g>
+    <!-- arms hammering -->
+    <rect x="70" y="170" width="30" height="90" fill="#000" transform="rotate(-20 70 170)"/>
+    <rect x="300" y="170" width="30" height="90" fill="#000" transform="rotate(20 300 170)"/>
+    <!-- commit dots -->
+    <g fill="#000">
+      <circle cx="80" cy="320" r="10"/>
+      <circle cx="130" cy="320" r="10"/>
+      <circle cx="180" cy="320" r="10"/>
+      <circle cx="230" cy="320" r="10" opacity="0.3"/>
+      <circle cx="280" cy="320" r="10" opacity="0.3"/>
+      <circle cx="330" cy="320" r="10" opacity="0.3"/>
+    </g>
+  </g>
+  <g filter="url(#grit4)">
+    <rect x="28" y="28" width="344" height="320" fill="none" stroke="#000" stroke-width="2" opacity="0.6"/>
+  </g>
+  <rect x="28" y="360" width="344" height="92" fill="#000"/>
+  <text x="200" y="398" text-anchor="middle" font-family="monospace" font-weight="900" font-size="26" fill="#ffff00">COMMIT MACHINE</text>
+  <text x="200" y="428" text-anchor="middle" font-family="monospace" font-weight="700" font-size="17" fill="#fff">PUSHES AT 3AM. SLEEPS NEVER.</text>
+  <text x="372" y="52" text-anchor="end" font-family="monospace" font-size="16" font-weight="900" fill="#000" transform="rotate(8 372 52)">No.004</text>
+</svg>

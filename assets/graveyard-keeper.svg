@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="480" viewBox="0 0 400 480">
+  <defs>
+    <pattern id="half2" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <circle cx="5" cy="5" r="2.8" fill="#000"/>
+    </pattern>
+    <filter id="grit2">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.4 0"/>
+      <feComposite operator="over" in2="SourceGraphic"/>
+    </filter>
+    <filter id="copy2">
+      <feTurbulence type="turbulence" baseFrequency="0.05" numOctaves="4" result="t"/>
+      <feDisplacementMap in="SourceGraphic" in2="t" scale="7"/>
+    </filter>
+  </defs>
+  <rect x="4" y="4" width="392" height="472" fill="#fff" stroke="#000" stroke-width="8"/>
+  <rect x="28" y="28" width="344" height="320" fill="#fff" stroke="#000" stroke-width="6"/>
+  <rect x="28" y="28" width="344" height="320" fill="url(#half2)" opacity="0.28"/>
+  <g filter="url(#copy2)">
+    <!-- moon -->
+    <circle cx="310" cy="90" r="34" fill="#000"/>
+    <circle cx="298" cy="82" r="28" fill="#fff"/>
+    <!-- tombstones -->
+    <g fill="#000" stroke="#000" stroke-width="4">
+      <rect x="60" y="220" width="70" height="100" fill="#fff"/>
+      <rect x="60" y="220" width="70" height="100" fill="none"/>
+      <text x="95" y="255" text-anchor="middle" font-family="monospace" font-size="22" font-weight="900" fill="#000">RIP</text>
+      <text x="95" y="280" text-anchor="middle" font-family="monospace" font-size="14" font-weight="900" fill="#000">v0.1</text>
+      <rect x="165" y="190" width="80" height="130" fill="#000"/>
+      <text x="205" y="235" text-anchor="middle" font-family="monospace" font-size="24" font-weight="900" fill="#ffff00">RIP</text>
+      <text x="205" y="262" text-anchor="middle" font-family="monospace" font-size="16" font-weight="900" fill="#fff">TODO</text>
+      <text x="205" y="286" text-anchor="middle" font-family="monospace" font-size="16" font-weight="900" fill="#fff">APP</text>
+      <rect x="275" y="225" width="65" height="95" fill="#fff"/>
+      <text x="307" y="258" text-anchor="middle" font-family="monospace" font-size="20" font-weight="900" fill="#000">404</text>
+    </g>
+    <!-- ground -->
+    <rect x="28" y="318" width="344" height="30" fill="#000"/>
+    <!-- bat silhouettes -->
+    <g fill="#000">
+      <polygon points="90,110 110,95 130,110 120,105 110,115 100,105"/>
+      <polygon points="230,130 250,115 270,130 260,125 250,135 240,125"/>
+    </g>
+  </g>
+  <g filter="url(#grit2)">
+    <rect x="28" y="28" width="344" height="320" fill="none" stroke="#000" stroke-width="2" opacity="0.6"/>
+  </g>
+  <rect x="28" y="360" width="344" height="92" fill="#000"/>
+  <text x="200" y="398" text-anchor="middle" font-family="monospace" font-weight="900" font-size="26" fill="#00ffff">GRAVEYARD KEEPER</text>
+  <text x="200" y="428" text-anchor="middle" font-family="monospace" font-weight="700" font-size="18" fill="#fff">LAST PUSH: 3 YEARS AGO.</text>
+  <text x="372" y="52" text-anchor="end" font-family="monospace" font-size="16" font-weight="900" fill="#000" transform="rotate(8 372 52)">No.002</text>
+</svg>

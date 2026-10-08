@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560">
+  <defs>
+    <pattern id="dgrid" width="36" height="36" patternUnits="userSpaceOnUse">
+      <path d="M 36 0 L 0 0 0 36" fill="none" stroke="#000" stroke-width="1.2"/>
+    </pattern>
+    <pattern id="halftone" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(25)">
+      <circle cx="5" cy="5" r="2.6" fill="#000"/>
+    </pattern>
+    <style>
+      .mono { font-family: 'JetBrains Mono', Courier, monospace; }
+      .disp { font-family: 'Space Grotesk', Arial Black, sans-serif; }
+      .blink { animation: blink 1s steps(1) infinite; }
+      @keyframes blink { 0%,55% { opacity: 1; } 56%,100% { opacity: 0; } }
+    </style>
+  </defs>
+
+  <rect width="1200" height="560" fill="#e0e0e0"/>
+  <rect width="1200" height="560" fill="url(#dgrid)"/>
+
+  <!-- ===== terminal window ===== -->
+  <rect x="58" y="48" width="640" height="464" fill="#000"/>
+  <rect x="46" y="36" width="640" height="464" fill="#fff" stroke="#000" stroke-width="6"/>
+  <rect x="46" y="36" width="640" height="56" fill="#00ffff" stroke="#000" stroke-width="6"/>
+  <circle cx="76" cy="64" r="10" fill="#000"/>
+  <circle cx="104" cy="64" r="10" fill="#000"/>
+  <circle cx="132" cy="64" r="10" fill="#000"/>
+  <text x="380" y="72" text-anchor="middle" class="mono" font-size="22" font-weight="900" fill="#000">$ ROAST // LIVE</text>
+
+  <!-- typed lines appear staggered -->
+  <g class="mono" font-size="21" font-weight="700">
+    <text x="76" y="140" fill="#000" opacity="0">$ fetch @octocat …<animate attributeName="opacity" from="0" to="1" begin="0.4s" dur="0.01s" fill="freeze"/></text>
+    <text x="76" y="176" fill="#000" opacity="0">✓ 8 repos · 24,476 followers<animate attributeName="opacity" from="0" to="1" begin="1.1s" dur="0.01s" fill="freeze"/></text>
+    <text x="76" y="212" fill="#000" opacity="0">✓ stack: HTML / CSS / JS<animate attributeName="opacity" from="0" to="1" begin="1.8s" dur="0.01s" fill="freeze"/></text>
+    <rect x="76" y="232" width="580" height="120" fill="#ff00ff" stroke="#000" stroke-width="5" opacity="0">
+      <animate attributeName="opacity" from="0" to="1" begin="2.5s" dur="0.01s" fill="freeze"/>
+    </rect>
+    <text x="96" y="268" fill="#000" font-weight="900" opacity="0">“8 repos of pure mystery.”<animate attributeName="opacity" from="0" to="1" begin="2.5s" dur="0.01s" fill="freeze"/></text>
+    <text x="96" y="300" fill="#000" font-weight="900" opacity="0">“Bio? Never met her.”<animate attributeName="opacity" from="0" to="1" begin="2.9s" dur="0.01s" fill="freeze"/></text>
+    <text x="96" y="332" fill="#000" font-weight="900" opacity="0">“Recruiters see HTML. Ship JS.”<animate attributeName="opacity" from="0" to="1" begin="3.3s" dur="0.01s" fill="freeze"/></text>
+    <rect x="76" y="372" width="580" height="52" fill="#ffff00" stroke="#000" stroke-width="5" opacity="0">
+      <animate attributeName="opacity" from="0" to="1" begin="4.0s" dur="0.01s" fill="freeze"/>
+    </rect>
+    <text x="96" y="406" fill="#000" font-weight="900" opacity="0">🛟 RESCUE: pin best repo → README → ship PR<animate attributeName="opacity" from="0" to="1" begin="4.0s" dur="0.01s" fill="freeze"/></text>
+    <rect class="blink" x="76" y="440" width="18" height="30" fill="#000"/>
+  </g>
+
+  <!-- ===== meme polaroid springs out from behind ===== -->
+  <g>
+    <animateTransform attributeName="transform" type="translate" values="-260 40; 0 0" keyTimes="0; 1" begin="4.4s" dur="0.9s" fill="freeze" calcMode="spline" keySplines="0.34 1.56 0.64 1"/>
+    <animate attributeName="opacity" values="0; 1" keyTimes="0; 1" begin="4.4s" dur="0.3s" fill="freeze"/>
+    <g transform="translate(760 130) rotate(12)">
+      <rect x="-150" y="-160" width="300" height="360" fill="#000"/>
+      <rect x="-160" y="-170" width="300" height="360" fill="#fff" stroke="#000" stroke-width="6"/>
+      <rect x="-160" y="-258" width="120" height="30" fill="#ffff00" stroke="#000" stroke-width="3" transform="rotate(-14)"/>
+      <circle cx="0" cy="-178" r="14" fill="#cc0000" stroke="#000" stroke-width="3"/>
+      <rect x="-136" y="-140" width="252" height="210" fill="#fff" stroke="#000" stroke-width="5"/>
+      <rect x="-136" y="-140" width="252" height="210" fill="url(#halftone)" opacity="0.25"/>
+      <path d="M-60 50 L-60 -30 Q-60 -80 0 -80 Q60 -80 60 -30 L60 50 L40 32 L25 50 L5 32 L-15 50 L-30 32 L-45 50 Z" fill="#fff" stroke="#000" stroke-width="7"/>
+      <circle cx="-18" cy="-35" r="10" fill="#000"/>
+      <circle cx="18" cy="-35" r="10" fill="#000"/>
+      <rect x="-116" y="92" width="212" height="56" fill="#000"/>
+      <text x="-10" y="118" text-anchor="middle" class="mono" font-size="22" font-weight="900" fill="#ff00ff">README GHOST</text>
+      <text x="-10" y="140" text-anchor="middle" class="mono" font-size="14" font-weight="700" fill="#fff">DOCS? NEVER HEARD OF HER</text>
+    </g>
+  </g>
+
+  <!-- caption strip -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" begin="5.2s" dur="0.01s" fill="freeze"/>
+    <rect x="750" y="440" width="380" height="48" fill="#000"/>
+    <text x="940" y="471" text-anchor="middle" class="mono" font-size="20" font-weight="900" fill="#00ffff">MEME SPRINGS OUT · back.out(1.7)</text>
+  </g>
+</svg>

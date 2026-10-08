@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="480" viewBox="0 0 400 480">
+  <defs>
+    <pattern id="half3" width="11" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <circle cx="5.5" cy="5.5" r="3" fill="#000"/>
+    </pattern>
+    <filter id="grit3">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.38 0"/>
+      <feComposite operator="over" in2="SourceGraphic"/>
+    </filter>
+    <filter id="copy3">
+      <feTurbulence type="turbulence" baseFrequency="0.045" numOctaves="4" result="t"/>
+      <feDisplacementMap in="SourceGraphic" in2="t" scale="6"/>
+    </filter>
+  </defs>
+  <rect x="4" y="4" width="392" height="472" fill="#fff" stroke="#000" stroke-width="8"/>
+  <rect x="28" y="28" width="344" height="320" fill="#fff" stroke="#000" stroke-width="6"/>
+  <rect x="28" y="28" width="344" height="320" fill="url(#half3)" opacity="0.25"/>
+  <g filter="url(#copy3)">
+    <!-- ghost body -->
+    <path d="M130 290 L130 180 Q130 110 200 110 Q270 110 270 180 L270 290 L245 265 L225 290 L205 265 L185 290 L165 265 L145 290 Z" fill="#fff" stroke="#000" stroke-width="10"/>
+    <circle cx="175" cy="180" r="16" fill="#000"/>
+    <circle cx="225" cy="180" r="16" fill="#000"/>
+    <circle cx="180" cy="175" r="5" fill="#fff"/>
+    <circle cx="230" cy="175" r="5" fill="#fff"/>
+    <ellipse cx="200" cy="225" rx="22" ry="28" fill="#000"/>
+    <!-- empty README page -->
+    <g transform="rotate(-12 95 120)">
+      <rect x="55" y="85" width="90" height="110" fill="#fff" stroke="#000" stroke-width="6"/>
+      <rect x="65" y="100" width="70" height="10" fill="#000"/>
+      <rect x="65" y="118" width="50" height="6" fill="#000"/>
+      <rect x="65" y="130" width="60" height="6" fill="#000"/>
+      <text x="100" y="175" text-anchor="middle" font-family="monospace" font-size="28" font-weight="900" fill="#000">?</text>
+    </g>
+    <!-- cobweb corner -->
+    <g stroke="#000" stroke-width="4" fill="none">
+      <line x1="372" y1="28" x2="300" y2="28"/>
+      <line x1="372" y1="28" x2="372" y2="100"/>
+      <line x1="372" y1="28" x2="320" y2="90"/>
+      <path d="M350 28 Q350 60 372 70"/>
+      <path d="M330 28 Q335 75 372 95"/>
+    </g>
+  </g>
+  <g filter="url(#grit3)">
+    <rect x="28" y="28" width="344" height="320" fill="none" stroke="#000" stroke-width="2" opacity="0.6"/>
+  </g>
+  <rect x="28" y="360" width="344" height="92" fill="#000"/>
+  <text x="200" y="398" text-anchor="middle" font-family="monospace" font-weight="900" font-size="30" fill="#ff00ff">README GHOST</text>
+  <text x="200" y="428" text-anchor="middle" font-family="monospace" font-weight="700" font-size="18" fill="#fff">DOCS? NEVER HEARD OF HER.</text>
+  <text x="372" y="52" text-anchor="end" font-family="monospace" font-size="16" font-weight="900" fill="#000" transform="rotate(8 372 52)">No.003</text>
+</svg>

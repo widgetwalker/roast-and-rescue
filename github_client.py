@@ -15,6 +15,7 @@ Security Review (security-review skill integration):
 """
 
 import os
+import re
 import requests
 import time
 from typing import Dict, List, Any, Optional
@@ -23,6 +24,21 @@ from typing import Dict, List, Any, Optional
 def _get_auth_headers() -> dict:
     """Get authentication headers if GITHUB_TOKEN is set or available via gh CLI."""
     token = os.environ.get("GITHUB_TOKEN")
+    if not token:
+        env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+        if os.path.exists(env_path):
+            try:
+                with open(env_path, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line.startswith("GITHUB_TOKEN="):
+                            val = line.split("=", 1)[1].strip().strip('"').strip("'")
+                            if val:
+                                token = val
+                                os.environ["GITHUB_TOKEN"] = val
+                                break
+            except Exception:
+                pass
     if not token:
         try:
             import subprocess
@@ -66,12 +82,7 @@ def _delay(seconds: float) -> None:
     """Small delay to help avoid rate limiting."""
     time.sleep(max(0, seconds))
 
-
-import re
-
 USERNAME_REGEX = re.compile(r"^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$")
-
-
 class GitHubClient:
     """Client for fetching GitHub public profile and repo data with in-memory caching."""
 
@@ -150,14 +161,14 @@ class GitHubClient:
         return data
 
     def get_user_repos(
-        self, username: str, per_page: int = 10, sort: str = "stars"
+        self, username: str, per_page: int = 100, sort: str = "pushed"
     ) -> Optional[List[Dict[str, Any]]]:
-        """Fetch user's public repositories sorted by stars with caching.
+        """Fetch user's public repositories with caching.
 
         Args:
             username: GitHub username
-            per_page: Number of repos to fetch (max 30 per page)
-            sort: Sort field (stars, forked, updated)
+            per_page: Number of repos to fetch (max 100 per page)
+            sort: Sort field (created, updated, pushed, full_name)
 
         Returns:
             List of repository dictionaries, or None if rate limited
@@ -232,7 +243,139 @@ class GitHubClient:
         if response.status_code == 404:
             raise ValueError(f"Repository '{owner}/{repo}' not found")
         return response.json()
+    def get_repo_readme(self, owner: str, repo: str) -> str:
+        """Fetch the README content for a repository.
 
+        Args:
+            owner: Repository owner
+            repo: Repository name
+
+        Returns:
+            String containing README content, or empty string if not found
+        """
+        self._rate_limit()
+        url = f"https://api.github.com/repos/{owner}/{repo}/readme"
+        headers = _get_auth_headers()
+        headers["Accept"] = "application/vnd.github.v3.raw"
+        
+        try:
+            response = requests.get(url, headers=headers, timeout=10)
+            if response.status_code == 200:
+                return response.text
+        except Exception:
+            pass
+        return ""
+
+    def get_repo_languages(self, owner: str, repo: str) -> Dict[str, int]:
+        """Fetch language byte counts for a repository.
+
+        Args:
+            owner: Repository owner
+            repo: Repository name
+
+        Returns:
+            Dictionary mapping language name to bytes of code
+        """
+        self._rate_limit()
+        url = f"https://api.github.com/repos/{owner}/{repo}/languages"
+        headers = _get_auth_headers()
+        
+        try:
+            response = requests.get(url, headers=headers, timeout=10)
+            if response.status_code == 200:
+                return response.json()
+            return None
+        except Exception:
+            return None
+
+    def get_repo_commits(
+        self, owner: str, repo: str, author: str = "", limit: int = 10
+    ) -> List[Dict[str, str]]:
+        """Fetch verified recent commits for a repository.
+
+        Hits /repos/{owner}/{repo}/commits directly — real commit telemetry
+        (message + timestamp). Unlike the events feed (which only embeds
+        commit summaries for recent pushes), this is ground truth used by
+        the psych-eval so we never claim "no code pushed" for active authors.
+
+        Args:
+            owner: Repository owner
+            repo: Repository name
+            author: GitHub username to filter commits by (author= query param)
+            limit: Max commits to return (clamped to 1-30)
+
+        Returns:
+            List of {"message": str, "date": str} dicts (ISO 8601 dates),
+            or empty list on any failure/rate limit
+        """
+        self._rate_limit()
+        url = f"https://api.github.com/repos/{owner}/{repo}/commits"
+        params = {"per_page": max(1, min(limit, 30))}
+        if author:
+            params["author"] = author
+        headers = _get_auth_headers()
+
+        try:
+            response = requests.get(url, params=params, headers=headers, timeout=10)
+            if response.status_code != 200:
+                return []
+            out: List[Dict[str, str]] = []
+            for entry in response.json():
+                commit = (entry.get("commit") or {}) if isinstance(entry, dict) else {}
+                author_info = commit.get("author") or {}
+                out.append({
+                    "message": commit.get("message", "") or "",
+                    "date": author_info.get("date", "") or "",
+                })
+            return out
+        except Exception:
+            return []
+
+    def get_repo_tree(
+        self, owner: str, repo: str, branch: str = ""
+    ) -> List[str]:
+        """Fetch the recursive file skeleton of a repository's default tree.
+
+        Hits /repos/{owner}/{repo}/git/trees/{branch}?recursive=1 and
+        returns lowercased file paths (e.g. "dockerfile",
+        ".github/workflows/ci.yml", "tests/test_api.py"). Lets the audit
+        verify Dockerfiles, CI pipelines, tests and backend models instead
+        of guessing from repo names.
+
+        Args:
+            owner: Repository owner
+            repo: Repository name
+            branch: Branch name (defaults to the repo's default_branch)
+
+        Returns:
+            List of lowercased paths; empty list on any failure,
+            truncation, or rate limit (callers treat as "no signal")
+        """
+        self._rate_limit()
+        if not branch:
+            try:
+                details = self.get_repo_details(owner, repo)
+                branch = (details or {}).get("default_branch", "") or ""
+            except Exception:
+                branch = ""
+        if not branch:
+            branch = "main"
+        url = "https://api.github.com/repos/%s/%s/git/trees/%s" % (owner, repo, branch)
+        params = {"recursive": "1"}
+        headers = _get_auth_headers()
+
+        try:
+            response = requests.get(url, params=params, headers=headers, timeout=15)
+            if response.status_code != 200:
+                return []
+            tree = response.json().get("tree", []) or []
+            return [
+                (entry.get("path", "") or "").lower()
+                for entry in tree
+                if isinstance(entry, dict) and entry.get("path")
+            ]
+        except Exception:
+            return []
 
 def format_repo_summary(repos: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Create a summarized view of the top repositories.

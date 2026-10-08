@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="480" viewBox="0 0 400 480">
+  <defs>
+    <pattern id="halftone" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(25)">
+      <circle cx="6" cy="6" r="3.2" fill="#000"/>
+    </pattern>
+    <filter id="grit">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.35 0"/>
+      <feComposite operator="over" in2="SourceGraphic"/>
+    </filter>
+    <filter id="photocopy">
+      <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="4" result="t"/>
+      <feDisplacementMap in="SourceGraphic" in2="t" scale="6"/>
+    </filter>
+  </defs>
+  <!-- polaroid paper -->
+  <rect x="4" y="4" width="392" height="472" fill="#fff" stroke="#000" stroke-width="8"/>
+  <!-- photo area -->
+  <rect x="28" y="28" width="344" height="320" fill="#fff" stroke="#000" stroke-width="6"/>
+  <rect x="28" y="28" width="344" height="320" fill="url(#halftone)" opacity="0.25"/>
+  <!-- deity silhouette: giant head + halo + rays -->
+  <g filter="url(#photocopy)">
+    <ellipse cx="200" cy="70" rx="110" ry="18" fill="none" stroke="#000" stroke-width="10"/>
+    <ellipse cx="200" cy="70" rx="80" ry="10" fill="#000"/>
+    <g fill="#000">
+      <polygon points="200,90 40,240 360,240"/>
+      <polygon points="200,110 90,240 310,240" fill="#fff"/>
+      <polygon points="200,130 130,240 270,240" fill="#000"/>
+    </g>
+    <rect x="150" y="190" width="100" height="60" fill="#000"/>
+    <rect x="165" y="205" width="20" height="12" fill="#fff"/>
+    <rect x="215" y="205" width="20" height="12" fill="#fff"/>
+    <rect x="120" y="150" width="14" height="90" fill="#000" transform="rotate(-25 120 150)"/>
+    <rect x="266" y="150" width="14" height="90" fill="#000" transform="rotate(25 266 150)"/>
+    <!-- lightning commits -->
+    <polygon points="80,260 110,260 90,300 120,300 85,348 150,290 115,290 135,260" fill="#000"/>
+    <polygon points="290,260 320,260 300,300 330,300 295,348 360,290 325,290 345,260" fill="#000"/>
+  </g>
+  <g filter="url(#grit)">
+    <rect x="28" y="28" width="344" height="320" fill="none" stroke="#000" stroke-width="2" opacity="0.6"/>
+  </g>
+  <!-- caption -->
+  <rect x="28" y="360" width="344" height="92" fill="#000"/>
+  <text x="200" y="398" text-anchor="middle" font-family="monospace" font-weight="900" font-size="30" fill="#ffff00">TECH DEITY</text>
+  <text x="200" y="428" text-anchor="middle" font-family="monospace" font-weight="700" font-size="18" fill="#fff">10K COMMITS. ZERO MERCY.</text>
+  <text x="372" y="52" text-anchor="end" font-family="monospace" font-size="16" font-weight="900" fill="#000" transform="rotate(8 372 52)">No.001</text>
+</svg>

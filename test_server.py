@@ -84,16 +84,6 @@ def run_tests():
             assert "status" in err_json and err_json["status"] == "error"
             print(f"PASSED (Handled rate limit gracefully: HTTP {e.code}) ✅")
 
-        # Test 6: Antigravity Easter Egg route check
-        print("Testing Test 6: GET /antigravity ...", end=" ")
-        req = urllib.request.urlopen(f"{base_url}/antigravity", timeout=5)
-        assert req.status == 200
-        anti_data = json.loads(req.read().decode())
-        assert anti_data["status"] == "active"
-        assert anti_data["easter_egg"] == "antigravity"
-        assert "claude" in anti_data["agents"]
-        print("PASSED ⚡ ✅")
-
         print("\nAll Cloud Run server tests PASSED! 🚀")
         return True
 

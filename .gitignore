@@ -1,26 +1,35 @@
-# Byte-compiled / optimized / DLL files
+# === Secrets & Environment ===
+.env
+.env.local
+.env.*.local
+
+# === Database (generated at runtime) ===
+*.db
+
+# === Python bytecode ===
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Environment & Secrets
-.env
-.env.local
-
-# Virtual environments
+# === Virtual environments ===
 .venv/
 env/
 venv/
 ENV/
 
-# Testing & Coverage
+# === Testing & Coverage ===
 .pytest_cache/
 .coverage
 htmlcov/
 
-# Editor / OS artifacts
+# === Editor / OS artifacts ===
 .DS_Store
 *.swp
 *.swo
 .vscode/
 .idea/
+
+# === Agent / tool-generated directories ===
+.archify/
+.claude/
+.opencode/
