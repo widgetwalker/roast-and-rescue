@@ -29,6 +29,14 @@ htmlcov/
 .vscode/
 .idea/
 
+# === Node.js & Build Artifacts ===
+node_modules/
+dist/
+coverage/
+.aistudio/
+bun.lock
+*.patch
+
 # === Agent / tool-generated directories ===
 .archify/
 .claude/

@@ -1,9 +1,5 @@
 import assert from "assert";
-import {
-  GitHubClient,
-  format_profile_summary,
-  format_repo_summary,
-} from "../src/githubClient.js";
+import { GitHubClient, format_profile_summary, format_repo_summary } from "../src/githubClient.js";
 
 /**
  * Unit Test Suite
@@ -20,8 +16,9 @@ export function runUnitTests(): { passed: number; total: number } {
       fn();
       console.log(`  ✅ [PASS] ${name}`);
       passed++;
-    } catch (err: any) {
-      console.error(`  ❌ [FAIL] ${name}:`, err.message);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`  ❌ [FAIL] ${name}:`, msg);
       throw err;
     }
   }
@@ -42,15 +39,18 @@ export function runUnitTests(): { passed: number; total: number } {
   });
 
   // Test 3: Username Validation - Rejections
-  unitTest("Username validation: Rejects path traversal, whitespace, empty, and invalid characters", () => {
-    assert.throws(() => client.validateUsername(""), /Invalid/i);
-    assert.throws(() => client.validateUsername("   "), /Invalid/i);
-    assert.throws(() => client.validateUsername("../etc/passwd"), /Invalid/i);
-    assert.throws(() => client.validateUsername("user/repo"), /Invalid/i);
-    assert.throws(() => client.validateUsername("user name"), /Invalid/i);
-    assert.throws(() => client.validateUsername("-invalidleading"), /Invalid/i);
-    assert.throws(() => client.validateUsername("invalidtrailing-"), /Invalid/i);
-  });
+  unitTest(
+    "Username validation: Rejects path traversal, whitespace, empty, and invalid characters",
+    () => {
+      assert.throws(() => client.validateUsername(""), /Invalid/i);
+      assert.throws(() => client.validateUsername("   "), /Invalid/i);
+      assert.throws(() => client.validateUsername("../etc/passwd"), /Invalid/i);
+      assert.throws(() => client.validateUsername("user/repo"), /Invalid/i);
+      assert.throws(() => client.validateUsername("user name"), /Invalid/i);
+      assert.throws(() => client.validateUsername("-invalidleading"), /Invalid/i);
+      assert.throws(() => client.validateUsername("invalidtrailing-"), /Invalid/i);
+    }
+  );
 
   // Test 4: Format profile summary with null input
   unitTest("Profile summary formatter: Handles null and undefined inputs safely", () => {

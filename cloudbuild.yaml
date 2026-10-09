@@ -1,28 +1,43 @@
 steps:
-  # Step 1: Build the container image
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/roast-and-rescue:$COMMIT_SHA', '.']
+  # Step 1: Quality Gate - Dependency Installation
+  - name: "node:22-slim"
+    entrypoint: "npm"
+    args: ["ci"]
 
-  # Step 2: Push the image to Container / Artifact Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/roast-and-rescue:$COMMIT_SHA']
+  # Step 2: Quality Gate - Static Analysis & Strict TypeScript Linting
+  - name: "node:22-slim"
+    entrypoint: "npm"
+    args: ["run", "lint"]
 
-  # Step 3: Deploy image to Google Cloud Run
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  # Step 3: Quality Gate - Automated Test & WCAG 2.1 AA Audit Suite
+  - name: "node:22-slim"
+    entrypoint: "npm"
+    args: ["test"]
+
+  # Step 4: Build the container image
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/roast-and-rescue:$COMMIT_SHA", "."]
+
+  # Step 5: Push the image to Container / Artifact Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/$PROJECT_ID/roast-and-rescue:$COMMIT_SHA"]
+
+  # Step 6: Deploy image to Google Cloud Run
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: gcloud
     args:
-      - 'run'
-      - 'deploy'
-      - 'roast-and-rescue'
-      - '--image'
-      - 'gcr.io/$PROJECT_ID/roast-and-rescue:$COMMIT_SHA'
-      - '--region'
-      - 'us-central1'
-      - '--platform'
-      - 'managed'
-      - '--allow-unauthenticated'
-      - '--port'
-      - '8080'
+      - "run"
+      - "deploy"
+      - "roast-and-rescue"
+      - "--image"
+      - "gcr.io/$PROJECT_ID/roast-and-rescue:$COMMIT_SHA"
+      - "--region"
+      - "us-central1"
+      - "--platform"
+      - "managed"
+      - "--allow-unauthenticated"
+      - "--port"
+      - "8080"
 
 images:
-  - 'gcr.io/$PROJECT_ID/roast-and-rescue:$COMMIT_SHA'
+  - "gcr.io/$PROJECT_ID/roast-and-rescue:$COMMIT_SHA"

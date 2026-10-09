@@ -1,9 +1,5 @@
 import assert from "assert";
-import {
-  analyze_profile,
-  audit_resume_vs_reality,
-  compare_profiles,
-} from "../src/analyzer.js";
+import { analyze_profile, audit_resume_vs_reality, compare_profiles } from "../src/analyzer.js";
 
 /**
  * Heuristic Analyzer Test Suite
@@ -20,8 +16,9 @@ export function runAnalyzerTests(): { passed: number; total: number } {
       fn();
       console.log(`  ✅ [PASS] ${name}`);
       passed++;
-    } catch (err: any) {
-      console.error(`  ❌ [FAIL] ${name}:`, err.message);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`  ❌ [FAIL] ${name}:`, msg);
       throw err;
     }
   }
@@ -81,10 +78,10 @@ export function runAnalyzerTests(): { passed: number; total: number } {
     });
     assert(
       result.roast.includes("GRAVEYARD") ||
-      result.roast.includes("ARCHETYPE") ||
-      result.recruiter_glance.toLowerCase().includes("ghost") ||
-      result.recruiter_glance.toLowerCase().includes("dormant") ||
-      result.roast.length > 0
+        result.roast.includes("ARCHETYPE") ||
+        result.recruiter_glance.toLowerCase().includes("ghost") ||
+        result.recruiter_glance.toLowerCase().includes("dormant") ||
+        result.roast.length > 0
     );
   });
 
@@ -106,7 +103,10 @@ export function runAnalyzerTests(): { passed: number; total: number } {
       },
     ];
     const result = analyze_profile(profile, repos, "rockstar", {});
-    assert(result.roast.length > 0 && (result.roast.includes("ARCHETYPE") || result.roast.includes("DEITY")));
+    assert(
+      result.roast.length > 0 &&
+        (result.roast.includes("ARCHETYPE") || result.roast.includes("DEITY"))
+    );
     assert(result.recruiter_glance.includes("Profile Vibe"));
   });
 
@@ -120,19 +120,25 @@ export function runAnalyzerTests(): { passed: number; total: number } {
       ],
     };
     const result = analyze_profile(profile, [], "night-owl", context);
-    assert(result.psych_eval.includes("Diagnosis:") || result.psych_eval.includes("Insomnia") || result.psych_eval.includes("Night Owl") || result.psych_eval.length > 20);
+    assert(
+      result.psych_eval.includes("Diagnosis:") ||
+        result.psych_eval.includes("Insomnia") ||
+        result.psych_eval.includes("Night Owl") ||
+        result.psych_eval.length > 20
+    );
   });
 
   // Test 5: Resume vs Reality - High discrepancy
   analyzerTest("Resume vs Reality: Identifies unbacked seniority and AI buzzword claims", () => {
     const claimBio = "Principal AI Architect leading multi-cloud Kubernetes clusters";
-    const actualRepos = [
-      { name: "calculator", size: 100, language: "HTML", topics: [] },
-    ];
+    const actualRepos = [{ name: "calculator", size: 100, language: "HTML", topics: [] }];
     const audit = audit_resume_vs_reality("", claimBio, actualRepos, { HTML: 2000 });
     assert(audit.discrepancies.length > 0);
     const hasBuzzwordDiscrepancy = audit.discrepancies.some(
-      (d: any) => d.claim.toLowerCase().includes("ai") || d.claim.toLowerCase().includes("architect") || d.claim.toLowerCase().includes("cloud")
+      (d: { claim: string }) =>
+        d.claim.toLowerCase().includes("ai") ||
+        d.claim.toLowerCase().includes("architect") ||
+        d.claim.toLowerCase().includes("cloud")
     );
     assert(hasBuzzwordDiscrepancy, "Must flag AI/Cloud/Architect claims without receipt code");
     assert(audit.vibe_ratio.length > 0);
@@ -146,7 +152,12 @@ export function runAnalyzerTests(): { passed: number; total: number } {
       total_size_kb: 80000,
       repo_data: {
         top_repos: [
-          { name: "core-kernel", stars: 1200, archived: false, last_push: new Date().toISOString() },
+          {
+            name: "core-kernel",
+            stars: 1200,
+            archived: false,
+            last_push: new Date().toISOString(),
+          },
         ],
       },
       recent_commits: ["feat: lockless queue implementation"],

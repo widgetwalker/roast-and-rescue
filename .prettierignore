@@ -1,0 +1,9 @@
+dist
+node_modules
+coverage
+package-lock.json
+bun.lock
+*.webm
+*.png
+architecture.html
+public/index.html

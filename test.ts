@@ -47,8 +47,9 @@ async function main() {
       const api = await runApiTests();
       grandPassed += api.passed;
       grandTotal += api.total;
-    } catch (err: any) {
-      console.warn("⚠️ API Integration tests skipped (dev server not responding):", err.message);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn("⚠️ API Integration tests skipped (dev server not responding):", msg);
     }
   }
 

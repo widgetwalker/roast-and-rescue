@@ -152,7 +152,9 @@ function extractProfileFeatures(
   const sorted_langs = Object.entries(lang_counts).sort((a, b) => b[1] - a[1]);
   const primary_lang = sorted_langs.length > 0 ? sorted_langs[0][0] : "Code";
 
-  const sorted_by_stars = [...repos].sort((a, b) => (Number(b?.stars) || 0) - (Number(a?.stars) || 0));
+  const sorted_by_stars = [...repos].sort(
+    (a, b) => (Number(b?.stars) || 0) - (Number(a?.stars) || 0)
+  );
   const top_star_repo = sorted_by_stars[0] || {};
   const top_star_count = Number(top_star_repo?.stars) || 0;
   const top_repo_name = top_star_repo?.name || (repos[0]?.name ? repos[0].name : "main-project");
@@ -178,7 +180,11 @@ function extractProfileFeatures(
 
   let archetype = "The Generalist Builder";
   if (followers > 20000 || top_star_count > 5000) {
-    archetype = randomChoice(["The Open-Source Titan", "The Tech Deity", "The 10x Engineer Personified"]);
+    archetype = randomChoice([
+      "The Open-Source Titan",
+      "The Tech Deity",
+      "The 10x Engineer Personified",
+    ]);
   } else if (public_repos <= 1) {
     archetype = randomChoice(["The Digital Ghost", "The Stealth Operative", "The Empty Canvas"]);
   } else if (repos.length > 0 && fork_count / Math.max(1, repos.length) >= 0.5) {
@@ -270,11 +276,7 @@ function extractProfileFeatures(
   };
 }
 
-function generateRecruiterGlance(
-  profile: any,
-  repos: any[],
-  events: any[] | null = null
-): string {
+function generateRecruiterGlance(profile: any, repos: any[], events: any[] | null = null): string {
   const f = extractProfileFeatures(profile, repos, events);
   const lang_summary = formatLanguages(repos);
   const followers = f.followers;
@@ -362,7 +364,10 @@ function generateRoast(
 
   // Tutorial Island
   if (tutorial_repos.length >= 2) {
-    const tut_list = tutorial_repos.slice(0, 3).map((t) => `'${t}'`).join(", ");
+    const tut_list = tutorial_repos
+      .slice(0, 3)
+      .map((t: string) => `'${t}'`)
+      .join(", ");
     const roasts = [
       `🏝️ ARCHETYPE: ${archetype}\n\nWe took one look at your repository lineup: ${tut_list}. Congratulations on completing every YouTube tutorial from 2022! You are one 'Weather App' away from an honorary Udemy certificate, but the software industry is still waiting for your debut.\n\nBuilding a todo app with local storage is a rite of passage, but shipping three of them is a hostage situation. Break out of the tutorial sandbox before you end up cloning Twitter for the fourth time.`,
       `🏝️ ARCHETYPE: ${archetype}\n\nAh yes, the holy trinity: ${tut_list}. Your profile is a monument to Codecademy modules and 12-hour freeCodeCamp videos. But learning how to write 'Hello World' in 5 different frameworks isn't exactly engineering.\n\nTime to close the guided tutorials and try building something without a safety net.`,
@@ -416,7 +421,7 @@ function generateRoast(
 
   const readme = f.readme_content;
   const is_profile_repo = Boolean(u) && top_repo.trim().toLowerCase() === u.trim().toLowerCase();
-  let desc_jab = "";
+  let desc_jab: string;
 
   if (is_profile_repo) {
     desc_jab = `Your '${top_repo}' profile README is doing the most — personal landing-page energy. Respect for the branding; now point that same effort at a repo with an actual test suite.`;
@@ -431,7 +436,10 @@ function generateRoast(
     desc_jab = `Wait, '${top_repo}' has a massive ${readme.length}-character README, but only ${total_code_bytes} bytes of actual code?! You wrote a whole dissertation for a starter template. Documentation writing checks your codebase literally cannot cash.`;
   } else if (readme.length < 50) {
     desc_jab = `The README for '${top_repo}' is basically a Post-It note. You expect people to \`npm install\` based on 3 words of documentation?`;
-  } else if (!readme.toLowerCase().includes("getting started") && !readme.toLowerCase().includes("install")) {
+  } else if (
+    !readme.toLowerCase().includes("getting started") &&
+    !readme.toLowerCase().includes("install")
+  ) {
     desc_jab = `Your '${top_repo}' README is a philosophical essay without any installation instructions. Nobody wants to read your manifesto, they just want the setup command.`;
   } else if (readme.length > 5000) {
     desc_jab = `The README for '${top_repo}' is longer than a Lord of the Rings book. Documentation is great, but nobody is reading a dissertation to use a simple tool.`;
@@ -449,7 +457,8 @@ function generateRoast(
     if (lazy_commits.length > 0) {
       commit_jab = `\n\nAlso, your recent commit history includes poetic masterpieces like '${lazy_commits[0]}'. Git blame must feel like a crime scene investigation.`;
     } else if (commits.some((c: string) => /(wip|test)/i.test(c))) {
-      commit_jab = "\n\nYour commits read like a stream of consciousness. Stop pushing 'WIP' directly to main.";
+      commit_jab =
+        "\n\nYour commits read like a stream of consciousness. Stop pushing 'WIP' directly to main.";
     }
   }
 
@@ -698,14 +707,53 @@ function diagnoseMentalStability(
   return "Diagnosis: Tragically Stable (Your commit history is painfully professional and boring.)";
 }
 
-const AI_PAT = /\b(ai|artificial intelligence|machine learning|deep learning|llms?|pytorch|tensorflow|computer vision|nlp|data scien\w*|neural nets?)\b/i;
-const DEVOPS_PAT = /\b(devops|cloud(?!flare)|kubernetes|k8s|docker|terraform|aws|azure|gcp|ci\s*\/\s*cd|site reliability|\bsre\b)\b/i;
-const SYSTEMS_PAT = /\b(rust|golang|\bgo\b|c\+\+|embedded|kernels?|systems programming|low.level)\b/i;
+const AI_PAT =
+  /\b(ai|artificial intelligence|machine learning|deep learning|llms?|pytorch|tensorflow|computer vision|nlp|data scien\w*|neural nets?)\b/i;
+const DEVOPS_PAT =
+  /\b(devops|cloud(?!flare)|kubernetes|k8s|docker|terraform|aws|azure|gcp|ci\s*\/\s*cd|site reliability|\bsre\b)\b/i;
+const SYSTEMS_PAT =
+  /\b(rust|golang|\bgo\b|c\+\+|embedded|kernels?|systems programming|low.level)\b/i;
 const FULLSTACK_PAT = /\b(full.?stack|backend|microservices?|rest apis?)\b/i;
 const WEB3_PAT = /\b(web3|solidity|blockchain|smart contracts?|defi|nfts?)\b/i;
-const BACKEND_LANGS = new Set(["python", "go", "rust", "java", "php", "ruby", "c#", "c++", "kotlin", "swift", "scala"]);
-const INFRA_MARKERS = ["dockerfile", "docker", "kubernetes", "k8s", "terraform", "github actions", "ci/cd", "pytest", "jest", "unittest", "coverage", "travis", "circleci"];
-const DB_MARKERS = ["postgres", "mysql", "mongo", "sqlite", "database", "prisma", "redis", "sqlalchemy", "supabase"];
+const BACKEND_LANGS = new Set([
+  "python",
+  "go",
+  "rust",
+  "java",
+  "php",
+  "ruby",
+  "c#",
+  "c++",
+  "kotlin",
+  "swift",
+  "scala",
+]);
+const INFRA_MARKERS = [
+  "dockerfile",
+  "docker",
+  "kubernetes",
+  "k8s",
+  "terraform",
+  "github actions",
+  "ci/cd",
+  "pytest",
+  "jest",
+  "unittest",
+  "coverage",
+  "travis",
+  "circleci",
+];
+const DB_MARKERS = [
+  "postgres",
+  "mysql",
+  "mongo",
+  "sqlite",
+  "database",
+  "prisma",
+  "redis",
+  "sqlalchemy",
+  "supabase",
+];
 const ML_FRAMEWORKS = ["torch", "tensorflow", "sklearn", "scikit", "transformers", "keras", "jax"];
 
 function skeletonEvidence(repo_files: Record<string, string[]> | null = null): Record<string, any> {
@@ -739,7 +787,15 @@ function skeletonEvidence(repo_files: Record<string, string[]> | null = null): R
     }
     if (
       p.startsWith(".github/workflows/") ||
-      ["travis.yml", ".travis.yml", "circle.yml", "config.yml", "gitlab-ci.yml", "jenkinsfile", "azure-pipelines.yml"].includes(b)
+      [
+        "travis.yml",
+        ".travis.yml",
+        "circle.yml",
+        "config.yml",
+        "gitlab-ci.yml",
+        "jenkinsfile",
+        "azure-pipelines.yml",
+      ].includes(b)
     ) {
       ci.push(p);
     }
@@ -775,7 +831,9 @@ function skeletonEvidence(repo_files: Record<string, string[]> | null = null): R
       db.push(p);
     }
     if (
-      [".pt", ".pth", ".onnx", ".safetensors", ".h5", ".ckpt", ".bin"].some((ext) => b.endsWith(ext)) ||
+      [".pt", ".pth", ".onnx", ".safetensors", ".h5", ".ckpt", ".bin"].some((ext) =>
+        b.endsWith(ext)
+      ) ||
       b.endsWith(".ipynb")
     ) {
       models.push(p);
@@ -869,7 +927,10 @@ export function audit_resume_vs_reality(
   // 1. AI / ML
   if (AI_PAT.test(text)) {
     if (python_share >= 0.3 && (ml_fw.length > 0 || skel.models.length > 0)) {
-      const proof = skel.models.length > 0 ? cite(skel.models, "model artifacts") : ml_fw.slice(0, 2).join(", ");
+      const proof =
+        skel.models.length > 0
+          ? cite(skel.models, "model artifacts")
+          : ml_fw.slice(0, 2).join(", ");
       add(
         "AI / ML Engineer",
         `VERIFIED-ish: ${Math.round(100 * python_share)}% Python with ${proof} in the codebase. Touch grass anyway.`,
@@ -986,7 +1047,7 @@ export function audit_resume_vs_reality(
 
   const claims = findings.length;
   const verified = findings.filter((d) => d.severity === "VERIFIED").length;
-  let vibe = 50;
+  let vibe: number;
   if (claims > 0) {
     vibe = Math.round((100 * (claims - verified)) / claims);
   } else {
@@ -1017,7 +1078,7 @@ export function audit_resume_vs_reality(
 
 export function analyze_profile(
   profile_data: any,
-  repos_data: any[],
+  repos_data: any[] = [],
   username: string,
   options: {
     events_data?: any[] | null;
@@ -1034,14 +1095,16 @@ export function analyze_profile(
   const repo_summary = format_repo_summary(repos_data);
 
   const handle = String(profile_summary.username || "").toLowerCase();
-  const raw_projects = repos_data.filter(
-    (r) => String(r?.name || "").toLowerCase() !== handle
-  );
+  const raw_projects = repos_data.filter((r) => String(r?.name || "").toLowerCase() !== handle);
   const project_top_repos = repo_summary.top_repos.filter(
     (r) => String(r?.name || "").toLowerCase() !== handle
   );
 
-  const recruiter_glance = generateRecruiterGlance(profile_summary, project_top_repos, options.events_data);
+  const recruiter_glance = generateRecruiterGlance(
+    profile_summary,
+    project_top_repos,
+    options.events_data
+  );
   const roast = generateRoast(
     profile_summary,
     project_top_repos,
@@ -1092,24 +1155,30 @@ export function analyze_profile(
 const VAGUE_TOKENS = new Set(["fix", "update", "wip", "test", "stuff", "changes", "done", "asdf"]);
 const SWEAR_TOKENS = ["fuck", "shit", "damn", "crap", "hell", "bitch", "ass"];
 
-function battleMetrics(analysis: Record<string, any>): Record<string, any> {
-  const repo_data = analysis.repo_data || {};
-  const top = Array.isArray(repo_data.top_repos) ? repo_data.top_repos : [];
+function battleMetrics(analysis: Record<string, unknown>): Record<string, number> {
+  const repo_data = (analysis.repo_data as Record<string, unknown>) || {};
+  const top = Array.isArray(repo_data.top_repos)
+    ? (repo_data.top_repos as Array<Record<string, unknown>>)
+    : [];
   const now = Date.now();
 
-  const zero_star = top.filter((r: any) => (Number(r?.stars) || 0) === 0).length;
-  const archived = top.filter((r: any) => Boolean(r?.archived)).length;
+  const zero_star = top.filter((r) => (Number(r?.stars) || 0) === 0).length;
+  const archived = top.filter((r) => Boolean(r?.archived)).length;
   let stale = 0;
   for (const r of top) {
-    const dt = parseGhDate(r?.last_push);
+    const dt = parseGhDate(String(r?.last_push || ""));
     if (dt && now - dt.getTime() > 365 * 24 * 60 * 60 * 1000) {
       stale++;
     }
   }
 
-  const msgs = (analysis.recent_commits || []).filter((m: any) => typeof m === "string" && m.trim());
+  const msgs = ((analysis.recent_commits as unknown[]) || []).filter(
+    (m: unknown): m is string => typeof m === "string" && Boolean(m.trim())
+  );
   const lowered = msgs.map((m: string) => m.toLowerCase());
-  const vague = lowered.filter((m: string) => VAGUE_TOKENS.has(m.trim()) || m.trim().length < 10).length;
+  const vague = lowered.filter(
+    (m: string) => VAGUE_TOKENS.has(m.trim()) || m.trim().length < 10
+  ).length;
   const profane = lowered.filter((m: string) => SWEAR_TOKENS.some((w) => m.includes(w))).length;
 
   return {
@@ -1126,11 +1195,11 @@ function battleMetrics(analysis: Record<string, any>): Record<string, any> {
 }
 
 export function compare_profiles(
-  analysis1: Record<string, any>,
-  analysis2: Record<string, any>
-): Record<string, any> {
-  const u1 = analysis1.username || "dev-1";
-  const u2 = analysis2.username || "dev-2";
+  analysis1: Record<string, unknown>,
+  analysis2: Record<string, unknown>
+): Record<string, unknown> {
+  const u1 = String(analysis1.username || "dev-1");
+  const u2 = String(analysis2.username || "dev-2");
   const m1 = battleMetrics(analysis1);
   const m2 = battleMetrics(analysis2);
 
@@ -1147,7 +1216,7 @@ export function compare_profiles(
   award("graveyard", (m2.graveyard > m1.graveyard ? 1 : 0) - (m1.graveyard > m2.graveyard ? 1 : 0));
   award("code_volume", (m1.code_kb > m2.code_kb ? 1 : 0) - (m2.code_kb > m1.code_kb ? 1 : 0));
 
-  let hygiene_note = "";
+  let hygiene_note: string;
   if (m1.commits_seen === 0 && m2.commits_seen === 0) {
     award("hygiene", 0);
     hygiene_note = "neither combatant left verifiable commit evidence";
@@ -1157,14 +1226,14 @@ export function compare_profiles(
   }
 
   if (s1 === s2) {
-    const stars1 = ((analysis1.repo_data?.top_repos || []) as any[]).reduce(
-      (sum, r) => sum + (Number(r?.stars) || 0),
-      0
-    );
-    const stars2 = ((analysis2.repo_data?.top_repos || []) as any[]).reduce(
-      (sum, r) => sum + (Number(r?.stars) || 0),
-      0
-    );
+    const repos1 = ((analysis1.repo_data as Record<string, unknown>)?.top_repos || []) as Array<{
+      stars?: unknown;
+    }>;
+    const repos2 = ((analysis2.repo_data as Record<string, unknown>)?.top_repos || []) as Array<{
+      stars?: unknown;
+    }>;
+    const stars1 = repos1.reduce((sum, r) => sum + (Number(r?.stars) || 0), 0);
+    const stars2 = repos2.reduce((sum, r) => sum + (Number(r?.stars) || 0), 0);
 
     if (stars1 === stars2) {
       return {

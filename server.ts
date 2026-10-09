@@ -1,16 +1,18 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import path from "path";
-import { fileURLToPath } from "url";
 import { GitHubClient } from "./src/githubClient.js";
+import { analyze_profile, audit_resume_vs_reality, compare_profiles } from "./src/analyzer.js";
+import { badgeContext, buildBadgeSvg } from "./src/badge.js";
+import { getLeaderboard, saveToLeaderboard } from "./src/leaderboard.js";
+import { brutalistLayout } from "./src/formatBrutalist.js";
 import {
-  analyze_profile,
-  audit_resume_vs_reality,
-  compare_profiles,
-} from "./src/analyzer.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+  GitHubRepoRaw,
+  RepoCommit,
+  RoastAnalysis,
+  BattleResult,
+  ResumeAuditResult,
+} from "./src/types.js";
 
 const app = express();
 const PORT = parseInt(process.env.PORT || "3000", 10);
@@ -18,126 +20,10 @@ const HOST = "0.0.0.0";
 
 const USERNAME_REGEX = /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/;
 
-// In-memory Leaderboard Store (Mock of SQLite database)
-interface LeaderboardEntry {
-  username: string;
-  archetype: string;
-  roast_preview: string;
-  timestamp: string;
-}
-
-const leaderboardStore: LeaderboardEntry[] = [];
-
-function saveToLeaderboard(username: string, archetype: string, roastPreview: string) {
-  try {
-    const existingIndex = leaderboardStore.findIndex(
-      (entry) => entry.username.toLowerCase() === username.toLowerCase()
-    );
-    const item: LeaderboardEntry = {
-      username,
-      archetype,
-      roast_preview: roastPreview,
-      timestamp: new Date().toISOString(),
-    };
-    if (existingIndex >= 0) {
-      leaderboardStore.splice(existingIndex, 1);
-    }
-    leaderboardStore.unshift(item);
-    if (leaderboardStore.length > 50) {
-      leaderboardStore.pop();
-    }
-  } catch (err) {
-    console.error("Leaderboard save error:", err);
-  }
-}
-
-function getLeaderboard(): LeaderboardEntry[] {
-  return leaderboardStore.slice(0, 10);
-}
-
-function getCachedBadge(username: string): { archetype: string; preview: string } | null {
-  const item = leaderboardStore.find(
-    (entry) => entry.username.toLowerCase() === username.toLowerCase()
-  );
-  if (item) {
-    return { archetype: item.archetype || "Roasted Dev", preview: item.roast_preview || "" };
-  }
-  return null;
-}
-
-async function badgeContext(
-  client: GitHubClient,
-  username: string
-): Promise<{ archetype: string; preview: string; roasted: boolean }> {
-  const cached = getCachedBadge(username);
-  if (cached) {
-    return { archetype: cached.archetype, preview: cached.preview, roasted: true };
-  }
-  try {
-    const profile = await client.get_user_profile(username);
-    if (!profile) {
-      return { archetype: "UNROASTED", preview: "Run a roast to earn an archetype", roasted: false };
-    }
-    const followers = profile.followers || 0;
-    const repos = profile.public_repos || 0;
-    return {
-      archetype: `Fresh Meat (${followers} followers)`,
-      preview: `@${username} commands ${repos} public repos — awaiting judgment`,
-      roasted: false,
-    };
-  } catch {
-    return { archetype: "UNROASTED", preview: "Run a roast to earn an archetype", roasted: false };
-  }
-}
-
-function buildBadgeSvg(username: string, archetype: string, preview: string, roasted: boolean): string {
-  const esc = (s: string) =>
-    (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-  const user = esc(username);
-  const arch = esc((archetype || "Developer").slice(0, 26));
-  const status = roasted ? "ROASTED" : "AWAITING ROAST";
-  const statusFill = roasted ? "#00ffff" : "#ffffff";
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="460" height="90" viewBox="0 0 460 90" role="img" aria-label="GitHub Roast badge for @${user}">
-<rect x="3" y="3" width="454" height="84" fill="#ffff00" stroke="#000000" stroke-width="5"/>
-<text x="18" y="30" font-family="monospace" font-size="14" font-weight="900" fill="#000000" textLength="420" lengthAdjust="spacingAndGlyphs">&#x1F525; ROAST &amp; RESCUE // @${user}</text>
-<rect x="15" y="42" width="272" height="32" fill="#000000"/>
-<text x="27" y="64" font-family="monospace" font-size="14" font-weight="900" fill="#ff00ff" textLength="248" lengthAdjust="spacingAndGlyphs">${arch}</text>
-<rect x="297" y="42" width="148" height="32" fill="${statusFill}" stroke="#000000" stroke-width="3"/>
-<text x="371" y="63" text-anchor="middle" font-family="monospace" font-size="12" font-weight="900" fill="#000000">${status}</text>
-</svg>`;
-}
-
-function brutalistLayout(sections: Record<string, string>, width: number = 80): string {
-  const center = (str: string, len: number, padChar: string = "█") => {
-    const padLen = Math.max(0, len - str.length);
-    const left = Math.floor(padLen / 2);
-    const right = padLen - left;
-    return padChar.repeat(left) + str + padChar.repeat(right);
-  };
-  const lines: string[] = [
-    "█".repeat(width),
-    center("  GITHUB ROAST & RESCUE  ", width, "█"),
-    center("  Honest feedback with actionable improvement advice  ", width, "█"),
-    "█".repeat(width),
-    "",
-  ];
-  for (const [name, content] of Object.entries(sections)) {
-    lines.push("▀".repeat(width));
-    lines.push(center(`  ${name.toUpperCase()}  `, width, "█"));
-    lines.push("▄".repeat(width));
-    for (const line of (content || "").split("\n")) {
-      lines.push(` █  ${line}`);
-    }
-    lines.push("");
-  }
-  lines.push("≡".repeat(width));
-  return lines.join("\n");
-}
-
 async function fetchRepoEvidence(
   client: GitHubClient,
   username: string,
-  projectRepos: any[],
+  projectRepos: GitHubRepoRaw[],
   topRepoName: string = "",
   topLangs: Record<string, number> = {}
 ): Promise<{ aggLanguages: Record<string, number>; skeletons: Record<string, string[]> }> {
@@ -182,7 +68,7 @@ async function fetchRepoEvidence(
   return { aggLanguages: agg, skeletons };
 }
 
-async function runFullAnalysis(client: GitHubClient, username: string): Promise<Record<string, any>> {
+async function runFullAnalysis(client: GitHubClient, username: string): Promise<RoastAnalysis> {
   const profile_data = await client.get_user_profile(username);
   if (!profile_data) {
     throw new Error(
@@ -198,7 +84,10 @@ async function runFullAnalysis(client: GitHubClient, username: string): Promise<
   } catch {}
 
   const project_repos = repos_data.filter(
-    (r) => String(r?.name || "").trim().toLowerCase() !== username.toLowerCase()
+    (r) =>
+      String(r?.name || "")
+        .trim()
+        .toLowerCase() !== username.toLowerCase()
   );
 
   const ordered = [...project_repos].sort(
@@ -208,7 +97,7 @@ async function runFullAnalysis(client: GitHubClient, username: string): Promise<
 
   let readme_content = "";
   let top_repo_languages: Record<string, number> = {};
-  let verified_commits: any[] = [];
+  let verified_commits: RepoCommit[] = [];
 
   if (top_repo_name) {
     try {
@@ -218,7 +107,8 @@ async function runFullAnalysis(client: GitHubClient, username: string): Promise<
       top_repo_languages = (await client.get_repo_languages(username, top_repo_name)) || {};
     } catch {}
     try {
-      verified_commits = (await client.get_repo_commits(username, top_repo_name, username, 10)) || [];
+      verified_commits =
+        (await client.get_repo_commits(username, top_repo_name, username, 10)) || [];
     } catch {}
   }
 
@@ -238,7 +128,7 @@ async function runFullAnalysis(client: GitHubClient, username: string): Promise<
     profile_readme,
     audit_languages: aggLanguages,
     repo_files: skeletons,
-  });
+  }) as any as RoastAnalysis;
 }
 
 const rootDir = process.cwd();
@@ -248,7 +138,7 @@ app.use(cors());
 app.use(express.json({ limit: "20mb" }));
 
 // Security Headers Middleware
-app.use((_req: Request, res: Response, next) => {
+app.use((_req: Request, res: Response, next: NextFunction) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("X-XSS-Protection", "1; mode=block");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -260,7 +150,7 @@ const requestCounts = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 120;
 
-app.use((req: Request, res: Response, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   const ip = req.ip || req.socket.remoteAddress || "unknown";
   const now = Date.now();
   const record = requestCounts.get(ip);
@@ -337,7 +227,9 @@ app.post(["/roast", "/api/roast"], async (req: Request, res: Response) => {
     return;
   }
 
-  const username = String(req.body.username || "").trim().replace(/^@/, "");
+  const username = String(req.body.username || "")
+    .trim()
+    .replace(/^@/, "");
   if (!username) {
     res.status(400).json({ status: "error", message: "Field 'username' is required" });
     return;
@@ -371,7 +263,10 @@ app.post(["/roast", "/api/roast"], async (req: Request, res: Response) => {
     } catch {}
 
     const project_repos = repos_data.filter(
-      (r) => String(r?.name || "").trim().toLowerCase() !== username.toLowerCase()
+      (r) =>
+        String(r?.name || "")
+          .trim()
+          .toLowerCase() !== username.toLowerCase()
     );
 
     const ordered = [...project_repos].sort(
@@ -381,7 +276,7 @@ app.post(["/roast", "/api/roast"], async (req: Request, res: Response) => {
 
     let readme_content = "";
     let top_repo_languages: Record<string, number> = {};
-    let verified_commits: any[] = [];
+    let verified_commits: RepoCommit[] = [];
 
     if (top_repo_name) {
       try {
@@ -391,7 +286,8 @@ app.post(["/roast", "/api/roast"], async (req: Request, res: Response) => {
         top_repo_languages = (await client.get_repo_languages(username, top_repo_name)) || {};
       } catch {}
       try {
-        verified_commits = (await client.get_repo_commits(username, top_repo_name, username, 10)) || [];
+        verified_commits =
+          (await client.get_repo_commits(username, top_repo_name, username, 10)) || [];
       } catch {}
     }
 
@@ -411,7 +307,7 @@ app.post(["/roast", "/api/roast"], async (req: Request, res: Response) => {
       profile_readme,
       audit_languages: aggLanguages,
       repo_files: skeletons,
-    });
+    }) as any as RoastAnalysis;
 
     const sections = {
       recruiter_glance: analysis.recruiter_glance || "",
@@ -437,25 +333,32 @@ app.post(["/roast", "/api/roast"], async (req: Request, res: Response) => {
       resume_vs_reality: analysis.resume_vs_reality || {},
       bento_formatted: brutalist_text,
     });
-  } catch (err: any) {
-    if (err.message?.includes("rate limit")) {
-      res.status(429).json({ status: "error", message: err.message });
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    if (errorMsg.includes("rate limit")) {
+      res.status(429).json({ status: "error", message: errorMsg });
       return;
     }
     console.error("Roast error:", err);
-    res.status(500).json({ status: "error", message: `Internal error: ${err.message}` });
+    res.status(500).json({ status: "error", message: `Internal error: ${errorMsg}` });
   }
 });
 
 // Route: POST /battle & /api/battle
 app.post(["/battle", "/api/battle"], async (req: Request, res: Response) => {
   if (!req.body || typeof req.body !== "object" || Object.keys(req.body).length === 0) {
-    res.status(400).json({ status: "error", message: "Missing JSON request body with 'user1' and 'user2'" });
+    res
+      .status(400)
+      .json({ status: "error", message: "Missing JSON request body with 'user1' and 'user2'" });
     return;
   }
 
-  const user1 = String(req.body.user1 || "").trim().replace(/^@/, "");
-  const user2 = String(req.body.user2 || "").trim().replace(/^@/, "");
+  const user1 = String(req.body.user1 || "")
+    .trim()
+    .replace(/^@/, "");
+  const user2 = String(req.body.user2 || "")
+    .trim()
+    .replace(/^@/, "");
 
   if (!user1 || !user2) {
     res.status(400).json({
@@ -488,24 +391,25 @@ app.post(["/battle", "/api/battle"], async (req: Request, res: Response) => {
     const analysis1 = await runFullAnalysis(client, user1);
     const analysis2 = await runFullAnalysis(client, user2);
 
-    const result = compare_profiles(analysis1, analysis2);
+    const result = compare_profiles(analysis1 as any, analysis2 as any) as any as BattleResult;
     result.archetypes = {
       [analysis1.username || user1]: analysis1.archetype || "Developer",
       [analysis2.username || user2]: analysis2.archetype || "Developer",
     };
 
     res.json({ status: "success", battle: result });
-  } catch (err: any) {
-    if (err.message?.includes("could not be fetched")) {
-      res.status(404).json({ status: "error", message: err.message });
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    if (errorMsg.includes("could not be fetched")) {
+      res.status(404).json({ status: "error", message: errorMsg });
       return;
     }
-    if (err.message?.includes("rate limit")) {
-      res.status(429).json({ status: "error", message: err.message });
+    if (errorMsg.includes("rate limit")) {
+      res.status(429).json({ status: "error", message: errorMsg });
       return;
     }
     console.error("Battle error:", err);
-    res.status(500).json({ status: "error", message: `Battle error: ${err.message}` });
+    res.status(500).json({ status: "error", message: `Battle error: ${errorMsg}` });
   }
 });
 
@@ -516,7 +420,9 @@ app.post(["/resume-audit", "/api/resume-audit"], async (req: Request, res: Respo
     return;
   }
 
-  const username = String(req.body.username || "").trim().replace(/^@/, "");
+  const username = String(req.body.username || "")
+    .trim()
+    .replace(/^@/, "");
   const resume_text = typeof req.body.resume_text === "string" ? req.body.resume_text : "";
 
   if (!username) {
@@ -561,7 +467,10 @@ app.post(["/resume-audit", "/api/resume-audit"], async (req: Request, res: Respo
 
     const repos = (await client.get_user_repos(username)) || [];
     const projects = repos.filter(
-      (r) => String(r?.name || "").trim().toLowerCase() !== username.toLowerCase()
+      (r) =>
+        String(r?.name || "")
+          .trim()
+          .toLowerCase() !== username.toLowerCase()
     );
 
     let top_langs: Record<string, number> = {};
@@ -592,7 +501,7 @@ app.post(["/resume-audit", "/api/resume-audit"], async (req: Request, res: Respo
       aggLanguages,
       skeletons,
       "resume"
-    );
+    ) as any as ResumeAuditResult;
     result.source = "uploaded_resume";
 
     res.json({
@@ -600,13 +509,14 @@ app.post(["/resume-audit", "/api/resume-audit"], async (req: Request, res: Respo
       username,
       resume_vs_reality: result,
     });
-  } catch (err: any) {
-    if (err.message?.includes("rate limit")) {
-      res.status(429).json({ status: "error", message: err.message });
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    if (errorMsg.includes("rate limit")) {
+      res.status(429).json({ status: "error", message: errorMsg });
       return;
     }
     console.error("Resume audit error:", err);
-    res.status(500).json({ status: "error", message: `Resume audit error: ${err.message}` });
+    res.status(500).json({ status: "error", message: `Resume audit error: ${errorMsg}` });
   }
 });
 
@@ -616,7 +526,7 @@ app.use((_req: Request, res: Response) => {
 });
 
 // Global Error Handler
-app.use((err: any, _req: Request, res: Response, _next: any) => {
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error("Unhandled server error:", err);
   res.status(500).json({ status: "error", message: err?.message || "Internal server error" });
 });

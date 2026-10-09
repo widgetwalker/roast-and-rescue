@@ -15,8 +15,9 @@ export async function runApiTests(): Promise<{ passed: number; total: number }> 
       await fn();
       console.log(`  ✅ [PASS] ${name}`);
       passed++;
-    } catch (err: any) {
-      console.error(`  ❌ [FAIL] ${name}:`, err.message);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`  ❌ [FAIL] ${name}:`, msg);
       throw err;
     }
   }

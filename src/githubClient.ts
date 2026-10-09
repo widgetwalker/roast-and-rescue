@@ -6,6 +6,16 @@
  * Optionally uses GITHUB_TOKEN env var for higher rate limits (5,000 req/hr).
  */
 
+import {
+  GitHubProfileRaw,
+  GitHubRepoRaw,
+  GitHubEventRaw,
+  ProfileSummary,
+  RepoSummary,
+  RepoSummaryList,
+  RepoCommit,
+} from "./types.js";
+
 const USERNAME_REGEX = /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/;
 
 function getAuthHeaders(extraHeaders: Record<string, string> = {}): Record<string, string> {
@@ -21,7 +31,7 @@ function getAuthHeaders(extraHeaders: Record<string, string> = {}): Record<strin
   return headers;
 }
 
-const FALLBACK_SNAPSHOTS: Record<string, { profile: any; repos: any[] }> = {
+const FALLBACK_SNAPSHOTS: Record<string, { profile: GitHubProfileRaw; repos: GitHubRepoRaw[] }> = {
   octocat: {
     profile: {
       login: "octocat",
@@ -42,6 +52,8 @@ const FALLBACK_SNAPSHOTS: Record<string, { profile: any; repos: any[] }> = {
         language: "HTML",
         size: 500,
         pushed_at: "2024-01-01T00:00:00Z",
+        fork: false,
+        html_url: "https://github.com/octocat/Spoon-Knife",
       },
       {
         name: "Hello-World",
@@ -49,6 +61,8 @@ const FALLBACK_SNAPSHOTS: Record<string, { profile: any; repos: any[] }> = {
         stargazers_count: 2500,
         language: "Ruby",
         size: 100,
+        fork: false,
+        html_url: "https://github.com/octocat/Hello-World",
       },
     ],
   },
@@ -72,28 +86,30 @@ const FALLBACK_SNAPSHOTS: Record<string, { profile: any; repos: any[] }> = {
         language: "C",
         size: 4500000,
         pushed_at: "2026-03-01T00:00:00Z",
+        fork: false,
+        html_url: "https://github.com/torvalds/linux",
       },
     ],
   },
 };
 
 export class GitHubClient {
-  private static sharedCache = new Map<string, { timestamp: number; data: any }>();
+  private static sharedCache = new Map<string, { timestamp: number; data: unknown }>();
   private cacheTtl: number;
 
   constructor(cacheTtlSeconds: number = 300) {
     this.cacheTtl = cacheTtlSeconds * 1000;
   }
 
-  private getFromCache(key: string): any | null {
+  private getFromCache<T>(key: string): T | null {
     const entry = GitHubClient.sharedCache.get(key);
     if (entry && Date.now() - entry.timestamp < this.cacheTtl) {
-      return entry.data;
+      return entry.data as T;
     }
     return null;
   }
 
-  private setCache(key: string, data: any): void {
+  private setCache<T>(key: string, data: T): void {
     GitHubClient.sharedCache.set(key, { timestamp: Date.now(), data });
   }
 
@@ -105,7 +121,7 @@ export class GitHubClient {
     return clean;
   }
 
-  public async get_user_profile(username: string): Promise<any | null> {
+  public async get_user_profile(username: string): Promise<GitHubProfileRaw | null> {
     let clean: string;
     try {
       clean = this.validateUsername(username);
@@ -114,7 +130,7 @@ export class GitHubClient {
     }
 
     const cacheKey = `profile:${clean.toLowerCase()}`;
-    const cached = this.getFromCache(cacheKey);
+    const cached = this.getFromCache<GitHubProfileRaw>(cacheKey);
     if (cached) return cached;
 
     try {
@@ -131,15 +147,15 @@ export class GitHubClient {
         }
         return null;
       }
-      const data = await res.json();
+      const data = (await res.json()) as GitHubProfileRaw;
       if (data && data.message === "Not Found") return null;
       this.setCache(cacheKey, data);
       return data;
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (FALLBACK_SNAPSHOTS[clean.toLowerCase()]) {
         return FALLBACK_SNAPSHOTS[clean.toLowerCase()].profile;
       }
-      if (err.message?.includes("rate limit")) throw err;
+      if (err instanceof Error && err.message?.includes("rate limit")) throw err;
       return null;
     }
   }
@@ -148,7 +164,7 @@ export class GitHubClient {
     username: string,
     per_page: number = 100,
     sort: string = "pushed"
-  ): Promise<any[] | null> {
+  ): Promise<GitHubRepoRaw[]> {
     let clean: string;
     try {
       clean = this.validateUsername(username);
@@ -157,7 +173,7 @@ export class GitHubClient {
     }
 
     const cacheKey = `repos:${clean.toLowerCase()}:${per_page}:${sort}`;
-    const cached = this.getFromCache(cacheKey);
+    const cached = this.getFromCache<GitHubRepoRaw[]>(cacheKey);
     if (cached) return cached;
 
     try {
@@ -177,24 +193,24 @@ export class GitHubClient {
           }
           throw new Error("GitHub API rate limit exceeded");
         }
-        return null;
+        return [];
       }
       const data = await res.json();
       if (Array.isArray(data)) {
-        this.setCache(cacheKey, data);
-        return data;
+        this.setCache(cacheKey, data as GitHubRepoRaw[]);
+        return data as GitHubRepoRaw[];
       }
       return [];
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (FALLBACK_SNAPSHOTS[clean.toLowerCase()]) {
         return FALLBACK_SNAPSHOTS[clean.toLowerCase()].repos;
       }
-      if (err.message?.includes("rate limit")) throw err;
+      if (err instanceof Error && err.message?.includes("rate limit")) throw err;
       return [];
     }
   }
 
-  public async get_recent_activity(username: string, limit: number = 5): Promise<any[] | null> {
+  public async get_recent_activity(username: string, limit: number = 5): Promise<GitHubEventRaw[]> {
     let clean: string;
     try {
       clean = this.validateUsername(username);
@@ -203,7 +219,7 @@ export class GitHubClient {
     }
 
     const cacheKey = `events:${clean.toLowerCase()}:${limit}`;
-    const cached = this.getFromCache(cacheKey);
+    const cached = this.getFromCache<GitHubEventRaw[]>(cacheKey);
     if (cached) return cached;
 
     try {
@@ -218,29 +234,28 @@ export class GitHubClient {
         if (res.status === 403 || res.status === 429) {
           throw new Error("GitHub API rate limit exceeded");
         }
-        return null;
+        return [];
       }
       const data = await res.json();
       if (Array.isArray(data)) {
-        this.setCache(cacheKey, data);
-        return data;
+        this.setCache(cacheKey, data as GitHubEventRaw[]);
+        return data as GitHubEventRaw[];
       }
       return [];
-    } catch (err: any) {
-      if (err.message?.includes("rate limit")) throw err;
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message?.includes("rate limit")) throw err;
       return [];
     }
   }
 
-  public async get_repo_details(owner: string, repo: string): Promise<any | null> {
+  public async get_repo_details(owner: string, repo: string): Promise<GitHubRepoRaw | null> {
     try {
       const res = await fetch(
         `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`,
         { headers: getAuthHeaders() }
       );
-      if (res.status === 404) return null;
-      if (!res.ok) return null;
-      return await res.json();
+      if (res.status === 404 || !res.ok) return null;
+      return (await res.json()) as GitHubRepoRaw;
     } catch {
       return null;
     }
@@ -270,7 +285,7 @@ export class GitHubClient {
         { headers: getAuthHeaders() }
       );
       if (res.status === 200) {
-        return (await res.json()) || {};
+        return ((await res.json()) as Record<string, number>) || {};
       }
       return {};
     } catch {
@@ -283,7 +298,7 @@ export class GitHubClient {
     repo: string,
     author: string = "",
     limit: number = 10
-  ): Promise<Array<{ message: string; date: string }>> {
+  ): Promise<RepoCommit[]> {
     try {
       const url = new URL(
         `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/commits`
@@ -296,7 +311,7 @@ export class GitHubClient {
       if (!res.ok) return [];
       const data = await res.json();
       if (!Array.isArray(data)) return [];
-      return data.map((entry: any) => ({
+      return data.map((entry: { commit?: { message?: string; author?: { date?: string } } }) => ({
         message: entry?.commit?.message || "",
         date: entry?.commit?.author?.date || "",
       }));
@@ -305,11 +320,7 @@ export class GitHubClient {
     }
   }
 
-  public async get_repo_tree(
-    owner: string,
-    repo: string,
-    branch: string = ""
-  ): Promise<string[]> {
+  public async get_repo_tree(owner: string, repo: string, branch: string = ""): Promise<string[]> {
     try {
       let b = branch;
       if (!b) {
@@ -323,15 +334,15 @@ export class GitHubClient {
       const tree = data?.tree;
       if (!Array.isArray(tree)) return [];
       return tree
-        .filter((entry: any) => typeof entry?.path === "string")
-        .map((entry: any) => entry.path.toLowerCase());
+        .filter((entry: { path?: unknown }) => typeof entry?.path === "string")
+        .map((entry: { path: string }) => entry.path.toLowerCase());
     } catch {
       return [];
     }
   }
 }
 
-export function format_repo_summary(repos: any[]): { top_repos: any[]; total_fetched: number } {
+export function format_repo_summary(repos: GitHubRepoRaw[]): RepoSummaryList {
   if (!Array.isArray(repos) || repos.length === 0) {
     return { top_repos: [], total_fetched: 0 };
   }
@@ -340,7 +351,7 @@ export function format_repo_summary(repos: any[]): { top_repos: any[]; total_fet
     .sort((a, b) => (Number(b?.stargazers_count) || 0) - (Number(a?.stargazers_count) || 0))
     .slice(0, 20);
 
-  const summary = sortedRepos.map((repo) => ({
+  const summary: RepoSummary[] = sortedRepos.map((repo) => ({
     name: repo?.name || "unknown",
     description: repo?.description || "",
     stars: Number(repo?.stargazers_count) || 0,
@@ -361,7 +372,9 @@ export function format_repo_summary(repos: any[]): { top_repos: any[]; total_fet
   return { top_repos: summary, total_fetched: repos.length };
 }
 
-export function format_profile_summary(profile: any): Record<string, any> {
+export function format_profile_summary(
+  profile: Partial<GitHubProfileRaw> | null | undefined
+): ProfileSummary {
   if (!profile || typeof profile !== "object") {
     return {
       username: "",
